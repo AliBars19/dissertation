@@ -27,3 +27,10 @@ recorded), `N/A`. Nothing below is verified yet. Entries say what to check, not 
 2. Record the exact URL and the date it was read; terms change.
 3. If the terms are unclear, ask the consultant and record the answer here.
 4. Anything copied, adapted or auto-generated is flagged per file in Appendix B (handbook 8.6).
+
+## Reading queue
+- [ ] Read the TfL transport data terms and the TfL design and branding page myself (L-01 to
+      L-03). Record the URL, the date, the exact attribution wording and whether a licence link
+      is required. Also check whether committing logged data to a public repo is allowed.
+- [ ] TrackerNet: register a key and check whether the endpoint still responds (L-02, L-03).
+      Tracked in `docs/pilot/README.md`.

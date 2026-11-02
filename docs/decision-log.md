@@ -101,16 +101,57 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   dissertations and whether a declaration of AI use is required; the AI-use log is the
   evidence for it.
 
-## D-008: Logger also written in Swift (on Linux)
-- **Date:** 2026-10-13 · **Status:** PROPOSED (awaiting my own decision)
-- **Context:** I said the project is "done by hand fully in Swift". The logger runs on
-  Linux, not the phone, so this reading needs confirming.
-- **Decision (if confirmed):** The data logger is a Swift command-line program running on
-  Linux (my machine).
-- **Alternatives:** A different language for the logger only (e.g. Java).
+## D-008: Logger written in Java (on Linux)
+- **Date:** 2026-10-27 · **Status:** DECIDED · **Decided by:** me
+- **Context:** I had said the project is done by hand fully in Swift, but the logger runs on
+  Linux, not the phone, so the language is a separate choice from the app's (D-005).
+- **Decision:** The data logger is a Java command-line program running on my Linux machine.
+  The app stays Swift/SwiftUI. All code is still written by me, by hand (D-007).
+- **Reasoning:** I know Java and find it easier to understand than the alternatives, and the
+  logger has to run reliably unattended for weeks.
+- **Alternatives considered:** Swift on Linux (would share model types with the app), Python.
+  Typescript and C++ I judged to have no advantage for this job.
+- **Consequences:** **[AI-expanded]** Models for the TfL JSON are written twice, once in Java and
+  once in Swift. Parsing JSON in Java needs a library or hand-written parsing; any library is
+  reused software that goes in `docs/licences.md` (L-08) and Appendix B. A JDK 17 is already on my
+  PATH.
 
 ## D-009: Version numbering: `prot-NN` for prototypes, semantic versions after
 - **Date:** 2026-10-13 · **Status:** DECIDED · **Decided by:** me
 - **Decision:** Prototypes are numbered `prot-01`, `prot-02`, `prot-03`, ... Once the project
   moves from prototype to the actual app, releases use semantic versions (`MAJOR.MINOR.PATCH`)
   starting at `0.5.0`.
+- **Update 2026-11-02:** `prot-NN` applies to the app itself, starting once it is built. The logger
+  and the wireframes each have their own separate version sequence (names not chosen yet).
+
+## D-010: App concept: flat 2D map with a pull-up sheet; 2D before 3D; no accounts
+- **Date:** 2026-11-02 · **Status:** DECIDED · **Decided by:** me
+- **Context:** I think existing apps such as TfL Go do not feel live, and do not let you see the
+  trains moving between stations. Sketches are in `docs/design/wireframes.md`.
+- **Decision:** One main screen, a flat 2D map. Live data is requested only when I tap a line or a
+  station, which opens a pull-up sheet with live arrivals and a 3D view. No account system for now.
+  The 2D map and sheet get built and working before any 3D work starts.
+- **Open points:** What the map shows before a tap. I want to use logged data matching the device's
+  time; see D-012.
+- **Consequences:** **[AI-expanded]** Train positions between stations are estimates, because
+  TrackerNet reports "between X and Y", so the UI labels them as estimated. The 3D view can only
+  be schematic unless an open source of tunnel depth turns up.
+
+## D-011: Whole-network coverage decided after the logger results
+- **Date:** 2026-11-02 · **Status:** PROPOSED (awaiting logger results) · **Decided by:** me
+- **Decision:** I lean towards covering the whole TfL map, but I make the final decision once I
+  have results from the logger.
+- **Alternative:** **[AI-expanded]** Draw the whole network, but show live trains and corrected
+  times only on lines that pass the pilot's go / no-go, because the train join may be poor on some
+  lines (R-01).
+
+## D-012: Bundled data or a server, and the storage format, decided after measuring
+- **Date:** 2026-11-02 · **Status:** PROPOSED (awaiting measured data sizes) · **Decided by:** me
+- **Context:** The app needs data derived from the logger. Bundling it avoids a server, but I am
+  concerned about the size of 7 days of data. A server adds uptime and database fetches.
+- **Decision:** I decide between bundling and a server, and between JSON, SQLite or another format,
+  once I have a feel for how big the data is and how it has to be stored.
+- **Alternatives:** Static files bundled in the app; a hosted server with a database.
+- **Update 2026-11-02:** The app looks up one row by station, so SQLite is my preferred format. I
+  will decide on bundling when the time comes, but probably will not bundle everything into the
+  app.
