@@ -13,7 +13,7 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 ---
 
 ## D-001: Data sources: TfL Unified API for predictions, TrackerNet for positions
-- **Date:** 2026-10-13 · **Status:** DECIDED · **Decided by:** me
+- **Date:** 2026-10-13 · **Status:** SUPERSEDED by D-014 · **Decided by:** me
 - **Context:** The study evaluates TfL's live Tube arrival predictions, so it needs (a) the
   predictions themselves and (b) an independent idea of when trains actually arrived. No
   official open source of actual Tube arrival times exists.
@@ -34,6 +34,8 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Context:** Without official actuals, any accuracy number depends on how "actual arrival"
   is defined. Prior work (Chan 2016, TfL buses) used "last prediction = actual", which is
   unvalidated and circular: it measures predictions against predictions.
+- **Update 2026-11-02:** The positions now come from the Unified API's `currentLocation` field, not
+  TrackerNet (D-014). The rule against using TfL's last prediction stands.
 - **Decision:** Infer actual arrival times from TrackerNet position changes, never from TfL's
   own last prediction. Validate the inference against (a) a small hand-timed stopwatch sample
   and (b) Darwin (National Rail actuals) at stations where Tube and National Rail services
@@ -56,6 +58,8 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   lookup tables built from the study's results.
 - **Reasoning:** A model adds complexity that the research question does not need, and its
   evaluation would compete for time with the data collection that the study depends on.
+- **Update 2026-11-02:** Still no model, but the lookup tables are now tested, not only displayed:
+  SQ3 and H1 test whether they reduce TfL's prediction error (D-013).
 - **Alternatives considered:** Regression or ML correction model (rejected: scope).
 - **Consequences:** The analysis is descriptive statistics over the logged data. The app's
   "usually late" hints are simple aggregates by (line, horizon, time of day, ...).
@@ -66,6 +70,9 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Decision:** The core evaluation uses benchmarks and logged data only, no participants, so
   the low-risk ethics route should apply.
 - **Reasoning:** No personal data is collected; the feeds are public operational data.
+- **Update 2026-11-02:** I now plan a commuter survey (SQ4 in `docs/research-question.md`), so "no
+  human participants" no longer holds for the whole project. This stays open until my consultant
+  answers F1 in `docs/consultant-questions.md`.
 - **Open points:** Confirm with my consultant. **[AI-expanded]** Ask specifically whether (a) any
   later app usability test with other people, and (b) me hand-timing trains on platforms,
   change the route.
@@ -134,7 +141,7 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Open points:** What the map shows before a tap. I want to use logged data matching the device's
   time; see D-012.
 - **Consequences:** **[AI-expanded]** Train positions between stations are estimates, because
-  TrackerNet reports "between X and Y", so the UI labels them as estimated. The 3D view can only
+  the feed reports "between X and Y", so the UI labels them as estimated. The 3D view can only
   be schematic unless an open source of tunnel depth turns up.
 
 ## D-011: Whole-network coverage decided after the logger results
@@ -155,3 +162,35 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Update 2026-11-02:** The app looks up one row by station, so SQLite is my preferred format. I
   will decide on bundling when the time comes, but probably will not bundle everything into the
   app.
+
+## D-013: Research question v1: measure, then correct
+- **Date:** 2026-11-02 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** v1 is in `docs/research-question.md`: measure how accurate and stable TfL's
+  predictions are, then test whether a lookup-table correction reduces their error. Stability is
+  measured and reported, but only accuracy is tested (H1). The survey is a fourth sub-question.
+- **Reasoning:** I want to try to beat TfL, not only measure it, and "better" for me means more
+  accurate and more stable. **[AI-expanded]** A lookup table can shift a time by a typical lateness
+  but is not designed to stop predictions jumping around, so a stability hypothesis would need
+  smoothing, which goes beyond lookup tables. The question can still be answered if the correction
+  fails, and stability needs no ground truth, so it survives if the position data proves unusable.
+- **Alternatives considered:** Predicting arrival times directly (reads as building a predictor,
+  against D-003); correction as the only headline question; testing stability too; dropping
+  stability; the survey as an objective rather than a sub-question.
+
+## D-014: Drop TrackerNet; use only the Unified API
+- **Date:** 2026-11-02 · **Status:** DECIDED · **Decided by:** me
+- **Context:** I had planned to use TrackerNet for train positions (D-001). A one-off request on
+  2026-11-02 to `/Line/victoria/Arrivals` returned a `currentLocation` field on all 224 records, for
+  example "At Seven Sisters" and "Between Tottenham Hale and Seven Sisters".
+- **Decision:** The project does not use TrackerNet. The Unified API supplies both the predictions
+  and the position text used to infer actual arrivals.
+- **Reasoning:** TrackerNet is an older system, so I am not going to bother with it.
+  **[AI-expanded]** Predictions and positions now arrive in the same record, so there are no two
+  feeds to join, and the legacy-feed risk (R-02) goes away.
+- **Alternatives considered:** Keeping TrackerNet as the position source; testing both feeds and
+  comparing them first.
+- **Consequences:** **[AI-expanded]** I give up any extra TrackerNet fields, such as train and trip
+  numbers, without having compared them. I checked `currentLocation` on one line at one moment only,
+  so the pilot has to confirm it works on my chosen lines. All data now depends on one feed. Positions
+  and predictions come from the same TfL source, so only the stopwatch sample and Darwin are
+  independent checks.

@@ -17,7 +17,7 @@ BSc Computer Science final-year project, City, University of London.
 | `docs/pilot/` | One-line pilot: line choice, logger schema, results |
 | `docs/sessions/` | Dated notes from each working session |
 | `docs/ai-use-log.md` | Every use of AI tools in this project |
-| `logger/` | Data logger for the TfL Unified API and TrackerNet |
+| `logger/` | Data logger for the TfL Unified API |
 | `data/` | Logged and derived data (commit policy to be decided) |
 | `app/` | The iOS app (Swift/SwiftUI, xtool on Fedora) |
 

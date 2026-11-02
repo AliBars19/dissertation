@@ -10,7 +10,7 @@ recorded), `N/A`. Nothing below is verified yet. Entries say what to check, not 
 | ID | Item | Used for | Licence / terms | Source URL | Status | Checked on | Obligations (attribution, restrictions, redistribution) | Where documented |
 |----|------|----------|-----------------|------------|--------|------------|----------------------------------------------------------|------------------|
 | L-01 | TfL Unified API data | Predictions under evaluation; app display | | | UNVERIFIED | | Brief says: credit "Powered by TfL Open Data", no roundel, no implied endorsement. Check: may the raw logged data be republished or committed to a public repo? Any caching or retention limits? | Method, Results, App, README |
-| L-02 | TfL TrackerNet feed | Train positions for inferring actual arrivals | | | UNVERIFIED | | Check: is the feed covered by the same terms as L-01? Key terms? Is it documented as supported or deprecated? | Method, Results |
+| L-02 | TfL TrackerNet feed | Not used (D-014) | | | N/A | | None | |
 | L-03 | TfL API key | Authenticated access, rate limits | | | UNVERIFIED | | Check: registration terms, rate limits, rules on sharing keys.  | Method |
 | L-04 | Darwin (National Rail) | Validating inferred actuals where lines overlap | | | UNVERIFIED | | Check: how access is obtained, whether use for a student project is allowed, attribution wording, redistribution of derived data | Method, Results |
 | L-05 | xtool | Building and signing the iOS app on Linux | | | UNVERIFIED | | Check: licence of the tool itself; what it needs from Apple (account type, signing, expiry of installed builds) | Method, Appendix B |
@@ -32,5 +32,4 @@ recorded), `N/A`. Nothing below is verified yet. Entries say what to check, not 
 - [ ] Read the TfL transport data terms and the TfL design and branding page myself (L-01 to
       L-03). Record the URL, the date, the exact attribution wording and whether a licence link
       is required. Also check whether committing logged data to a public repo is allowed.
-- [ ] TrackerNet: register a key and check whether the endpoint still responds (L-02, L-03).
-      Tracked in `docs/pilot/README.md`.
+- [ ] Register for a Unified API key and read the registration terms (L-03).

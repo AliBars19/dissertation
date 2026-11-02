@@ -34,7 +34,7 @@ with the date and how I got them (meeting or email), and then log any resulting 
 ## C. Data
 - [ ] C1. Is it acceptable to use historical or third-party archived data instead of logging my
       own, if it exists? (I am researching whether such data exists.)
-- [ ] C2. The ground truth is inferred from TrackerNet position data and validated with a small
+- [ ] C2. The ground truth is inferred from the Unified API's position text and validated with a small
       stopwatch sample and, where lines overlap, Darwin. Is this validation plan sufficient?
 - [ ] C3. May I commit logged data to the public repo, subject to the TfL terms?
 

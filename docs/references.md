@@ -25,7 +25,7 @@ Status: `READ` (source in hand, details checked), `FOUND` (located, not yet read
 
 ## Data and software sources
 Each data feed and tool needs a reference as well as a licence row (see `docs/licences.md`):
-TfL Unified API documentation, TrackerNet documentation, Darwin documentation, xtool, Swift.
+TfL Unified API documentation, Darwin documentation, xtool, Swift.
 Record title, author or organisation, year, URL and date accessed.
 
 ## Template for web sources
