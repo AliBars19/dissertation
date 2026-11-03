@@ -21,6 +21,7 @@ recorded), `N/A`. Nothing below is verified yet. Entries say what to check, not 
 | L-10 | Raschke "Trackernet Stringlines" (2025) | Method ideas; any figures or code | | | UNVERIFIED | | If any figure, code or data is reproduced: permission or licence needed (handbook 8.3, 8.5). Citing is not permission. | Context, Method |
 | L-11 | Map tiles / MapKit / station coordinates | App map | | | UNVERIFIED | | Check: source of station locations and line geometry, licence and attribution requirements | App, Appendix B |
 | L-12 | Own work: repo licence | Releasing logger, app and analysis | | | UNVERIFIED | | Decide: licence for own code; check City's IP rules (handbook 2.9: University may copy submissions for assessment) | README |
+| L-13 | EAS (Expo) and Apple Developer Program | Cloud builds and TestFlight distribution (D-015) | | | UNVERIFIED | | Check: Expo terms and free-plan limits; Apple Developer Program and TestFlight terms | Method, Appendix B |
 
 ## Rules for this register
 1. Add a row before using anything, not after.

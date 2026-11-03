@@ -194,3 +194,15 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   so the pilot has to confirm it works on my chosen lines. All data now depends on one feed. Positions
   and predictions come from the same TfL source, so only the stopwatch sample and Darwin are
   independent checks.
+
+## D-015: Testers get the app through TestFlight, built in the cloud with EAS
+- **Date:** 2026-11-02 · **Status:** DECIDED · **Decided by:** me
+- **Context:** I have no Mac (D-005), and survey participants need the app on their own iPhones
+  (SQ4).
+- **Decision:** I use EAS to build the app in the cloud and get it onto TestFlight for testers. To
+  test on my own phone I keep using xtool.
+- **Consequences:** **[AI-expanded]** Needs a paid Apple Developer Program membership and an Expo
+  account. Expo's docs say EAS is "designed to work for any native project", but they do not mention
+  Swift Package Manager or projects with no Xcode project, which is how xtool builds, so an early
+  test build has to confirm this. External testers may need Beta App Review on the first build, and
+  builds expire after 90 days.

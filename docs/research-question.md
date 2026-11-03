@@ -17,7 +17,7 @@ Wording drafted with Claude Code from my ideas, and I chose it from options (see
 
 ### Sub-questions
 - SQ1: How reliably can actual Tube arrival times be inferred from the position text in TfL's Unified API, when
-  checked against hand-timed observations and, where lines overlap?
+  checked against hand-timed observations and, where lines overlap, Darwin?
 - SQ2: How do the error and stability of TfL's predictions vary with line, time
   of day and service status?
 - SQ3: Does a lookup-table correction built from earlier logged data reduce prediction error on
