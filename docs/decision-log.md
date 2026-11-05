@@ -34,6 +34,7 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Context:** Without official actuals, any accuracy number depends on how "actual arrival"
   is defined. Prior work (Chan 2016, TfL buses) used "last prediction = actual", which is
   unvalidated and circular: it measures predictions against predictions.
+- **Update 2026-11-05:** Darwin is dropped; the hand-timed stopwatch sample is the only validation (D-016).
 - **Update 2026-11-02:** The positions now come from the Unified API's `currentLocation` field, not
   TrackerNet (D-014). The rule against using TfL's last prediction stands.
 - **Decision:** Infer actual arrival times from TrackerNet position changes, never from TfL's
@@ -192,8 +193,8 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Consequences:** **[AI-expanded]** I give up any extra TrackerNet fields, such as train and trip
   numbers, without having compared them. I checked `currentLocation` on one line at one moment only,
   so the pilot has to confirm it works on my chosen lines. All data now depends on one feed. Positions
-  and predictions come from the same TfL source, so only the stopwatch sample and Darwin are
-  independent checks.
+  and predictions come from the same TfL source, so only the stopwatch sample is an
+  independent check (Darwin was later dropped, D-016).
 
 ## D-015: Testers get the app through TestFlight, built in the cloud with EAS
 - **Date:** 2026-11-02 · **Status:** DECIDED · **Decided by:** me
@@ -206,3 +207,28 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   Swift Package Manager or projects with no Xcode project, which is how xtool builds, so an early
   test build has to confirm this. External testers may need Beta App Review on the first build, and
   builds expire after 90 days.
+
+## D-016: Drop Darwin; validate with the stopwatch sample only
+- **Date:** 2026-11-05 · **Status:** DECIDED · **Decided by:** me
+- **Context:** D-002 planned two checks on inferred arrivals: a hand-timed stopwatch sample and, where
+  lines overlap, Darwin (National Rail).
+- **Decision:** The project does not use Darwin. The stopwatch sample is the only independent check.
+- **Reasoning:** **[AI-expanded]** Darwin reports National Rail trains, and I have no evidence that it
+  covers Tube trains, so a National Rail arrival says nothing about when a Tube train arrived.
+- **Consequences:** **[AI-expanded]** The stopwatch sample carries SQ1 alone, so it needs a written
+  protocol and enough observations across lines and times of day. My consultant answered "yes" (C2)
+  to a plan that included Darwin, so I mention this change at my next meeting.
+
+## D-017: Repo licence is MIT
+- **Date:** 2026-11-05 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** My code is released under the MIT License.
+- **Alternatives considered:** No licence until the project is marked, Apache 2.0, GPL 3.0, CC BY 4.0.
+- **Consequences:** **[AI-expanded]** Anyone may reuse the code if they keep the notice, including
+  while the project is being assessed. The licence does not cover TfL data or third-party material.
+
+## D-018: Map drawn by me from TfL data
+- **Date:** 2026-11-05 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** The app's map is my own design, derived from Unified API data (station positions and
+  stop order). I design my own icons and do not use TfL's logos, roundel or Tube map design.
+- **Reasoning:** I can derive the map from the data, and I cannot use TfL's logos.
+

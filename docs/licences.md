@@ -4,33 +4,28 @@ Handbook 8.3 and 8.6 require that every piece of reused data, code, tool and tex
 checked and obeyed, and that reuse is documented in the Method chapter, the Results chapter and
 Appendix B. This register is where that evidence is collected from day one.
 
-Status values: `UNVERIFIED` (not yet read at source), `VERIFIED` (read at source, date and URL
-recorded), `N/A`. Nothing below is verified yet. Entries say what to check, not what the answer is.
+Status values: `UNVERIFIED` (not yet read at source), `VERIFIED` (read at source, date and URL recorded)
 
 | ID | Item | Used for | Licence / terms | Source URL | Status | Checked on | Obligations (attribution, restrictions, redistribution) | Where documented |
 |----|------|----------|-----------------|------------|--------|------------|----------------------------------------------------------|------------------|
-| L-01 | TfL Unified API data | Predictions under evaluation; app display | | | UNVERIFIED | | Brief says: credit "Powered by TfL Open Data", no roundel, no implied endorsement. Check: may the raw logged data be republished or committed to a public repo? Any caching or retention limits? | Method, Results, App, README |
-| L-02 | TfL TrackerNet feed | Not used (D-014) | | | N/A | | None | |
-| L-03 | TfL API key | Authenticated access, rate limits | | | UNVERIFIED | | Check: registration terms, rate limits, rules on sharing keys.  | Method |
-| L-04 | Darwin (National Rail) | Validating inferred actuals where lines overlap | | | UNVERIFIED | | Check: how access is obtained, whether use for a student project is allowed, attribution wording, redistribution of derived data | Method, Results |
-| L-05 | xtool | Building and signing the iOS app on Linux | | | UNVERIFIED | | Check: licence of the tool itself; what it needs from Apple (account type, signing, expiry of installed builds) | Method, Appendix B |
-| L-06 | Swift toolchain and standard libraries | App, and logger (may or may not be swift)| | | UNVERIFIED | | Check: licence text and any runtime library notices | Appendix B |
-| L-07 | Apple developer / device terms | Installing on own iPhone | | | UNVERIFIED | | Check: free vs paid account limits and terms | Method |
-| L-08 | Third-party Swift packages | Anything added later | | | UNVERIFIED | | One row per package: name, version, licence, what it does, which of my files use it | Appendix B |
-| L-09 | Tutorials, Stack Overflow, docs snippets | Ideas or code adapted by hand | | | UNVERIFIED | | One row per source: URL, date accessed, what was adapted, which file. Handbook 8.6 asks for this in Appendix B. | Appendix B, code comments |
-| L-10 | Raschke "Trackernet Stringlines" (2025) | Method ideas; any figures or code | | | UNVERIFIED | | If any figure, code or data is reproduced: permission or licence needed (handbook 8.3, 8.5). Citing is not permission. | Context, Method |
-| L-11 | Map tiles / MapKit / station coordinates | App map | | | UNVERIFIED | | Check: source of station locations and line geometry, licence and attribution requirements | App, Appendix B |
-| L-12 | Own work: repo licence | Releasing logger, app and analysis | | | UNVERIFIED | | Decide: licence for own code; check City's IP rules (handbook 2.9: University may copy submissions for assessment) | README |
-| L-13 | EAS (Expo) and Apple Developer Program | Cloud builds and TestFlight distribution (D-015) | | | UNVERIFIED | | Check: Expo terms and free-plan limits; Apple Developer Program and TestFlight terms | Method, Appendix B |
+| L-01 | TfL Unified API data | Predictions under evaluation; app display | TfL Transport Data Service licence, based on Open Government Licence v2.0 with TfL amendments | https://tfl.gov.uk/corporate/terms-and-conditions/transport-data-service | VERIFIED | 05/11/2026| Credit "Powered by TfL Open Data", no roundel, no implied endorsement. Contains OS data © Crown copyright and database rights 2016' and Geomni UK Map data © and database rights [2019] . The logger data can be published to the repo | Method, Results, App, README |
+| L-02 | TfL TrackerNet feed | Not used (D-014) | | | N/A | 05/11/2026 | None | |
+| L-03 | TfL API key | Authenticated access, rate limits | TfL Transport Data Service licence, based on Open Government Licence v2.0 with TfL amendments | https://tfl.gov.uk/corporate/terms-and-conditions/transport-data-service | VERIFIED | 05/11/2026 | Rate limited to 500 calls per minute per data feed. Key is used by my logger and app builds, never committed to the repo or published. If it leaks, I replace it. All other rules are that of L-01.  | Method |
+| L-04 | Darwin (National Rail) | Not used (D-016) | | | N/A | 05/11/2026 | None | |
+| L-05 | xtool | Building and signing the iOS app on Linux | MIT License| https://github.com/xtool-org/xtool/blob/main/LICENSE.md | VERIFIED | 05/11/2026 | Apple Developer Account is already in possession so that only need is met. | Method, Appendix B |
+| L-06 | Swift toolchain and standard libraries | App| Apache 2.0 with Runtime Library Exception| https://www.swift.org/legal/license.html | VERIFIED | 05/11/2026 | No specific notices for us to be aware of | Appendix B |
+| L-07 | Apple developer / device terms | Installing on own iPhone | Xcode and Apple SDKs Agreement | https://www.apple.com/legal/sla/docs/xcode.pdf| VERIFIED | 05/11/2026 | We currently have an Apple Dveeloper Account so nothing to worry about | Method |
+| L-08 | Third-party Swift packages | Anything added later | None at the moment | | N/A | 05/11/2026 | Nothing used at the moment. Add a row before using anything. | Appendix B |
+| L-09 | Tutorials, Stack Overflow, docs snippets | Ideas or code adapted by hand | None at the moment | | N/A | 05/11/2026 | Nothing used at the moment. Add a row before using anything. | Appendix B, code comments |
+| L-11 | Station positions, stop order, line shapes | App map, drawn as my own schematic | TfL Transport Data Service licence (L-01) | https://api.tfl.gov.uk/Line/victoria/Route/Sequence/inbound | VERIFIED | 05/11/2026 | Data from the Unified API under L-01, including its attribution statements. Layout and icons designed by me. TfL's Tube map design, logos and roundel are not reproduced. | App, Appendix B |
+| L-12 | Own work: repo licence | Releasing my logger and app code | MIT License | `LICENSE` in this repo | VERIFIED | 05/11/2026 | Applies to my own code only. Logged TfL data stays under L-01, and third-party material stays under its own terms.| README, Appendix B |
+| L-13 | EAS (Expo) | Cloud builds and TestFlight submission (D-015) | Expo Terms of Service | https://expo.dev/terms and https://expo.dev/pricing | VERIFIED | 05/11/2026 | Free plan: up to 15 iOS builds (per month) will only use these builds for testflight, local testing will be done via xtool. No attribution duty found. | Method, Appendix B |
+| L-14 | Apple Developer Program | TestFlight distribution to testers (D-015) | Apple Developer Program License Agreement | https://developer.apple.com/support/terms/apple-developer-program-license-agreement/ and https://developer.apple.com/programs/ | VERIFIED | 05/11/2026 | Testflight requires a privacy policy in the app and user consent before collecting user or device data. | Method, LSEPI, App |
+| L-15 | Java (Eclipse Temurin JDK 17) | Logger (D-008) | GPL v2 with Classpath Exception (the JDK's `legal/java.base/LICENSE`) | `~/.local/jdk-17/legal/java.base/LICENSE` | VERIFIED | 05/11/2026 | The Classpath Exception lets my own code link to the JDK without taking its licence. My default `java` is Red Hat OpenJDK 25, so confirm which version the logger uses. | Method, Appendix B |
+| L-16 | SQLite | Lookup tables (SQLite preferred, D-012) | Public domain | https://www.sqlite.org/copyright.html | VERIFIED | 05/11/2026 |Public use no concerns here | Appendix B |
 
 ## Rules for this register
 1. Add a row before using anything, not after.
 2. Record the exact URL and the date it was read; terms change.
 3. If the terms are unclear, ask the consultant and record the answer here.
 4. Anything copied, adapted or auto-generated is flagged per file in Appendix B (handbook 8.6).
-
-## Reading queue
-- [ ] Read the TfL transport data terms and the TfL design and branding page myself (L-01 to
-      L-03). Record the URL, the date, the exact attribution wording and whether a licence link
-      is required. Also check whether committing logged data to a public repo is allowed.
-- [ ] Register for a Unified API key and read the registration terms (L-03).

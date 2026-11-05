@@ -28,3 +28,7 @@ see `docs/ai-use-log.md` and decision D-007.
 ## Data
 Powered by TfL Open Data.
 This project is not affiliated with or endorsed by Transport for London.
+
+## Licence
+My code is released under the MIT License (see `LICENSE`). This does not cover TfL data, which stays
+under TfL's Transport Data Service terms, or other third-party material.

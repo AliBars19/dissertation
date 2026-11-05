@@ -17,7 +17,7 @@ Wording drafted with Claude Code from my ideas, and I chose it from options (see
 
 ### Sub-questions
 - SQ1: How reliably can actual Tube arrival times be inferred from the position text in TfL's Unified API, when
-  checked against hand-timed observations and, where lines overlap, Darwin?
+  checked against hand-timed observations?
 - SQ2: How do the error and stability of TfL's predictions vary with line, time
   of day and service status?
 - SQ3: Does a lookup-table correction built from earlier logged data reduce prediction error on
@@ -27,6 +27,8 @@ Wording drafted with Claude Code from my ideas, and I chose it from options (see
 
 ### Change since first writing v1
 SQ1 originally named TrackerNet as the position source. Changed the same day after I dropped it (D-014).
+
+SQ1 also named Darwin as a second check. Removed on 2026-11-05 (D-016).
 
 ### Hypothesis
 - H1 (for SQ3): The correction reduces mean absolute error on held-out data, compared with TfL's
