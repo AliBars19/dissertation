@@ -157,7 +157,7 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   lines (R-01).
 
 ## D-012: Bundled data or a server, and the storage format, decided after measuring
-- **Date:** 2026-11-02 · **Status:** PROPOSED (awaiting measured data sizes) · **Decided by:** me
+- **Date:** 2026-11-02 · **Status:** DECIDED 2026-11-06 (served, see D-021) · **Decided by:** me
 - **Context:** The app needs data derived from the logger. Bundling it avoids a server, but I am
   concerned about the size of 7 days of data. A server adds uptime and database fetches.
 - **Decision:** I decide between bundling and a server, and between JSON, SQLite or another format,
@@ -166,6 +166,8 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Update 2026-11-02:** The app looks up one row by station, so SQLite is my preferred format. I
   will decide on bundling when the time comes, but probably will not bundle everything into the
   app.
+- **Update 2026-11-06:** Decided: the data is served, not bundled. The app asks a small API on my
+  VPS for the logged snapshot matching the current time and day (D-021).
 
 ## D-013: Research question v1: measure, then correct
 - **Date:** 2026-11-02 · **Status:** DECIDED · **Decided by:** me
@@ -264,3 +266,56 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   no inferred arrivals to check it against. The two weeks should avoid the Christmas period. This
   replaces the continuous collection from 21 December to 7 March in my PDD Gantt chart; I tell my
   consultant at the next meeting.
+
+## D-021: Logged trains are replayed through an API on my VPS
+- **Date:** 2026-11-06 · **Status:** DECIDED · **Decided by:** me
+- **Context:** When no line is selected, the app shows what the logger recorded at the same time and
+  day of the week instead of live data. D-012 left open whether that data is bundled or served.
+- **Decision:** A small API on my VPS (D-019) serves the app the saved raw response closest to the
+  requested time and day. The app does not bundle the logged data.
+- **Alternatives considered:** Bundling a summary of typical positions in the app; serving a summary
+  instead of raw snapshots.
+- **Reasoning:** **[AI-expanded]** The raw responses are kept anyway (D-022), and one full-network
+  snapshot is about 146 KB gzipped, which is small enough to send to a phone.
+- **Consequences:** **[AI-expanded]** This adds a third component, written by me by hand, alongside the
+  logger and the app, and it has to stay up while testers use the app. A replay shows one real past
+  day, including any disruption on it, so the app labels it with the date it was recorded, not as
+  typical. Serving logged TfL data needs the same attribution as the app (L-01). The SQ3 lookup-table
+  correction is separate and is built from the logger's database. Details are decided before prot-02.
+
+## D-022: Logger database schema
+- **Date:** 2026-11-06 · **Status:** DECIDED · **Decided by:** me
+- **Context:** One full-network response on 2026-11-06 had 3,825 records. Stored with every field,
+  that is about 223 bytes per record in SQLite, or about 34 GB for two weeks at one request every 30
+  seconds, against 19 GB free on the VPS.
+- **Decision:** `logger/schema.sql` defines seven tables:
+  - `tflrequests`: one row per request, including failed ones (sent and received times, HTTP status,
+    size, record count, TfL's response timestamp, error, raw file, lines requested).
+  - `tflresponses`: one row per prediction, linked to its request. It keeps `vehicleId`, line,
+    station (`naptanId`), platform, `direction`, destination, `towards`, `currentLocation`,
+    `timeToStation` and `expectedArrival`.
+  - `lines`, `stations`, `platforms`, `towards`, `locations`: lookup tables, so each repeated text
+    value is stored once and predictions store only its ID.
+  - Dropped fields: `stationName` and `destinationName` (kept once in `stations`), `timestamp` (the
+    same for the whole response, so stored in `tflrequests`), `timeToLive`, `id`, `$type`,
+    `operationType`, `modeName`, `lineName`, `bearing` and the `timing` object.
+  - Raw responses are kept as compressed files on the VPS, and moved off once at the end.
+  - **Update 2026-11-06:** Raw files are one gzipped JSON Lines file per UTC hour, named like
+    `raw/2026-12-07/2026-12-07T08Z.jsonl.gz`. Each line is one response, starting with its
+    `request_id` and `sent_at`. A new file is opened each hour and the previous one closed cleanly,
+    so a crash loses at most the current hour's last write. `tflrequests.raw_file` holds the file
+    name, so the replay API (D-021) can find any request.
+  - **Update 2026-11-06:** Every request has a 10-second time limit. A failed, timed-out or empty
+    request still gets a `tflrequests` row, so gaps show up in the data. Which failures count as gaps,
+    and when TfL's data counts as stale, is decided in the analysis after the pilot.
+- **Reasoning:** **[AI-expanded]** In that response, `timeToLive` equalled `expectedArrival` in every
+  record, `timestamp` was the same in every record, and TfL's `id` was repeated in 352 records, so it
+  cannot be a key. `direction` was empty in 576 records, and `platformName` still gave the direction
+  in 544 of them. `vehicleId` is only unique within a line, so a train is identified by line and
+  `vehicleId` together. `expectedArrival` equals TfL's timestamp plus `timeToStation`, so it is kept
+  for convenience, not because it adds information.
+- **Consequences:** **[AI-expanded]** The logger switches foreign keys on for every connection
+  (`PRAGMA foreign_keys = ON`), or the links are not checked. Only predictions that changed since the
+  previous request are stored; what counts as "changed", and the request interval, are set from the
+  pilot. Indexes are chosen after the pilot, once the real size and queries are known. The patterns
+  above come from one response, so the pilot checks that they hold.
