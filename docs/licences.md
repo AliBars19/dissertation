@@ -27,7 +27,7 @@ Status values: `UNVERIFIED` (not yet read at source), `VERIFIED` (read at source
 | L-18 | Jackson (`jackson-core`, `jackson-databind`) | Logger: parsing TfL JSON | Apache 2.0 | https://github.com/FasterXML/jackson-databind/blob/3.x/LICENSE | VERIFIED | 06/11/2026 | Credit it; keep its licence and notice files if I redistribute it (for example in a packaged logger). I record the exact version here when I add it to Gradle. | Method, Appendix B |
 | L-19 | xerial `sqlite-jdbc` | Logger: writing to the SQLite database | Apache 2.0; bundles SQLite, which is public domain (L-16) | https://github.com/xerial/sqlite-jdbc/blob/master/LICENSE | VERIFIED | 06/11/2026 | Credit it; keep its licence and notice files if I redistribute it. I record the exact version here when I add it to Gradle. | Method, Appendix B |
 | L-20 | Gradle | Building the logger | Apache 2.0 | https://github.com/gradle/gradle/blob/master/LICENSE | VERIFIED | 06/11/2026 | Build tool only; nothing of it ships in the logger. I record the exact version here when I add it to Gradle. | Method |
-| L-21 | JUnit 5 | Logger unit tests | Eclipse Public License 2.0 | https://github.com/junit-team/junit-framework/blob/main/LICENSE.md | VERIFIED | 06/11/2026 | Test dependency only, never shipped. Credit it. I record the exact version here when I add it to Gradle. | Method |
+| L-21 | JUnit 6 (`junit-jupiter` 6.0.1, with `junit-platform-launcher`) | Logger unit tests | Eclipse Public License 2.0 | https://github.com/junit-team/junit-framework/blob/main/LICENSE.md | VERIFIED | 06/11/2026 | Test dependency only, never shipped. Credit it. Version 6.0.1, set in `logger/gradle/libs.versions.toml`. | Method |
 
 ## Rules for this register
 1. Add a row before using anything, not after.
