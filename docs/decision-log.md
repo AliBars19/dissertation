@@ -80,7 +80,7 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 
 ## D-005: Native Swift/SwiftUI on Fedora with xtool
 - **Date:** 2026-10-13 · **Status:** DECIDED · **Decided by:** me
-- **Context:** Dev machine is Fedora Linux; no Mac; test device is an iPhone 15.
+- **Context:** Dev machine is Fedora Linux; no Mac; test device is an iPhone 11 (see update).
 - **Decision:** Build a native Swift/SwiftUI app with xtool
   (github.com/xtool-org/xtool). No simulator, no hot reload; rebuild and install over USB.
 - **Reasoning:** Native SwiftUI suits a map-heavy live app, and xtool is a way to build and
@@ -89,6 +89,8 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   first. Early "hello world on my iPhone" spike de-risks the toolchain. **[AI-expanded]**
   Free Apple developer accounts limit how long an installed build stays valid; check what
   xtool needs for signing.
+- **Update 2026-11-05:** The test device is an iPhone 11 on iOS 27.2, not an iPhone 15. A
+  hello-world app built with xtool runs on it.
 
 ## D-006: Location stays on the device
 - **Date:** 2026-10-13 · **Status:** DECIDED · **Decided by:** me
@@ -123,6 +125,7 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   once in Swift. Parsing JSON in Java needs a library or hand-written parsing; any library is
   reused software that goes in `docs/licences.md` (L-08) and Appendix B. A JDK 17 is already on my
   PATH.
+- **Update 2026-11-06:** The logger runs on my OVHcloud VPS, not my Linux laptop (D-019).
 
 ## D-009: Version numbering: `prot-NN` for prototypes, semantic versions after
 - **Date:** 2026-10-13 · **Status:** DECIDED · **Decided by:** me
@@ -232,3 +235,32 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   stop order). I design my own icons and do not use TfL's logos, roundel or Tube map design.
 - **Reasoning:** I can derive the map from the data, and I cannot use TfL's logos.
 
+
+## D-019: Logger runs on my OVHcloud VPS
+- **Date:** 2026-11-06 · **Status:** DECIDED · **Decided by:** me
+- **Context:** The logger must run without gaps for weeks so ill run it on my server
+- **Decision:** The Java logger (D-008) runs on an OVHcloud VPS that I own.
+- **Alternatives considered:** My Fedora laptop left on or a raspberry pi.
+- **Consequences:** **[AI-expanded]** The logger runs as a service that restarts after a crash or
+  reboot. The VPS clock must stay synced (for example with chrony), because inferred arrival times
+  depend on it, and all times are stored in UTC. The TfL API key lives in an environment variable or
+  a config file on the VPS, never in the repo. Free disk space on the VPS limits how much raw data I
+  keep (D-020).
+
+## D-020: Main dataset is two full weeks of the whole network
+- **Date:** 2026-11-06 · **Status:** DECIDED · **Decided by:** me
+- **Context:** One request for all 11 Tube lines on 2026-11-06 returned 3,825 records and 3.6 MB
+  (146 KB gzipped). At one request every 30 seconds that is about 10 GB a day raw whic is too much to store anywhere
+- **Decision:** The main dataset is two consecutive full weeks of every Tube line, after the pilot.
+  Raw responses are kept compressed on the VPS (about 6 GB for two weeks at 30-second requests).
+  The request interval is set from the pilot.
+- **Reasoning:** **[AI-expanded]** H1 needs the lookup table to be built on earlier data and tested
+  on later data it has not seen. With one week, it would be built on weekdays and tested on a
+  weekend, and weekend service differs. Two weeks lets me build on week 1 and test on week 2 with the
+  same days of the week.
+- **Consequences:** **[AI-expanded]** The raw data is too big for the GitHub repo (single files over
+  100 MB are rejected), so the repo gets a sample plus derived tables, and the full raw data stays on
+  the VPS and a backup. The stopwatch sample must be taken during the two logged weeks, or there are
+  no inferred arrivals to check it against. The two weeks should avoid the Christmas period. This
+  replaces the continuous collection from 21 December to 7 March in my PDD Gantt chart; I tell my
+  consultant at the next meeting.
