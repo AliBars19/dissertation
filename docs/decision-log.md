@@ -319,3 +319,14 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   previous request are stored; what counts as "changed", and the request interval, are set from the
   pilot. Indexes are chosen after the pilot, once the real size and queries are known. The patterns
   above come from one response, so the pilot checks that they hold.
+
+## D-023: Pilot line is the Victoria line
+- **Date:** 2026-11-06 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** The pilot (`docs/pilot/README.md`) logs the Victoria line only.
+- **Reasoning:** **[AI-expanded]** It is self-contained with no branches, so every train runs the same
+  route between Walthamstow Central and Brixton, which makes following one train simpler. I already
+  have a sample response for it (2026-11-02 and 2026-11-06).
+- **Consequences:** **[AI-expanded]** Problems that only appear on branching or shared lines (the
+  Northern line's branches, trains on the District line changing destination, shared track on the
+  Circle and Hammersmith & City lines) are not tested by the pilot, so they are checked when the main
+  collection starts.
