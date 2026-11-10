@@ -8,11 +8,13 @@ import java.time.format.DateTimeFormatter;
 import java.io.*;
 import java.util.zip.GZIPOutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.*;
 
 public class Main {
 
     private static final DateTimeFormatter folderFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(java.time.ZoneOffset.UTC);//so for these two var's we get the current times because our design is going to be that raw data is split on an hourly basis with one folder containng an hours worth of raw data right, so this sets that up
     private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH'Z'").withZone(java.time.ZoneOffset.UTC);
+    private static int requestId = 0; // Initialize requestId to 0
 
     public static void main(String[] args) {
         
@@ -40,7 +42,14 @@ public class Main {
                 .timeout(java.time.Duration.ofSeconds(10))
                 .uri(URI.create("https://api.tfl.gov.uk/Line/victoria/Arrivals?app_key=" + key))
                 .build();
+        
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();//scheduler that we are gna be using to poll the func logandsave
+        scheduler.scheduleAtFixedRate(() -> logAndSave(client, request, dataDir), 0, 30, TimeUnit.SECONDS);//polling it eevry 30 seconds
+    }
+
+    public static void logAndSave(HttpClient client, HttpRequest request, String dataDir){
         try {
+            requestId++; 
             Instant sentTime = Instant.now();
 
             String folderName = folderFormatter.format(sentTime);
@@ -54,7 +63,7 @@ public class Main {
             if(response.statusCode() == 200) {
                 System.out.println("200 OK");
                 String line = //this is one line of our response of what were gna save
-                    "{\"request_id\":1,\"sent_at\":\"" +
+                    "{\"request_id\":" + requestId + ",\"sent_at\":\"" +
                     sentTime.toString() +
                     "\",\"response_body\":" +//this is building each line of the string one by one this is js a test for now
                     response.body() +
@@ -80,9 +89,10 @@ public class Main {
             }
             System.out.println("Size of the response body: " + response.body().getBytes().length + " bytes");
             
-            
         } catch (InterruptedException | IOException e) {//the client.send can return errors so we gotta catch them aswell or this will not compile java wont allow us to 
             System.err.println("IOException or InterruptedException " + e.getClass().getSimpleName() + " occurred");
+        }catch (RuntimeException e) {
+            System.err.println("An unexpected error occurred: " + e.getMessage());
         }
     }
 }
