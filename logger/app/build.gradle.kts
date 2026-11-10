@@ -18,7 +18,8 @@ repositories {
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
-
+    implementation(libs.jackson.databind)
+    implementation(libs.sqlite.jdbc)//these two lines are for checking if our packages compile and are 'healthy'. not testImplementation because that doesnt bundle it aswell
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 }
@@ -32,7 +33,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = "logger.Main"
 }
 
 tasks.named<Test>("test") {
