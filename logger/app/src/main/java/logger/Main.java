@@ -59,12 +59,28 @@ public class Main {
                     "\",\"response_body\":" +//this is building each line of the string one by one this is js a test for now
                     response.body() +
                     "}";
+                try (
+                    BufferedWriter writer = 
+                        new BufferedWriter(
+                        new OutputStreamWriter(//this turns text to utf8 for json
+                        new GZIPOutputStream(//these really messy looking lines are just to make sure that the file is written in a compressed format so that we can save space and not have to worry about running out of space on the server this is important because we are going to be logging a lot of data i mean a LOT of data, two weeks worth.
+                        new FileOutputStream(filePath.toFile(), true)), StandardCharsets.UTF_8)))
+                    {
+                        writer.write(line);
+                        writer.write("\n");
+                        System.out.println("saved to" + filePath);
+                    }
+            
+                catch (IOException e) {
+                    System.err.println("IOException occurred while writing to file: " + e.getMessage());
+                }  
             }
             else {
                 System.err.println("Error " + response.statusCode());
             }
             System.out.println("Size of the response body: " + response.body().getBytes().length + " bytes");
-
+            
+            
         } catch (InterruptedException | IOException e) {//the client.send can return errors so we gotta catch them aswell or this will not compile java wont allow us to 
             System.err.println("IOException or InterruptedException " + e.getClass().getSimpleName() + " occurred");
         }
