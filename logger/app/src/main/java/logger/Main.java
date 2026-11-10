@@ -18,8 +18,9 @@ public class Main {
             
         }
 
-        HttpClient client = HttpClient.newHttpClient().connectTimeout(java.time.Duration.ofSeconds(10)).build();//testing a fetch, victoria line seems most reliable so its the one that we are going to be testing i beliebve this was in the decisions log aready at some point
+        HttpClient client = HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();//testing a fetch, victoria line seems most reliable so its the one that we are going to be testing i beliebve this was in the decisions log aready at some point
         HttpRequest request = HttpRequest.newBuilder()
+                .timeout(java.time.Duration.ofSeconds(10))
                 .uri(URI.create("https://api.tfl.gov.uk/Line/victoria/Arrivals?app_key=" + key))
                 .build();
         try {

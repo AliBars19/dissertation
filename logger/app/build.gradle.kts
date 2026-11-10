@@ -40,3 +40,15 @@ tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
+tasks.named<JavaExec>("run"){//simple func to auto load .env into terminal when runnning/testing
+    val envFile = rootProject.file("../.env")
+    if(envFile.exists()){
+        envFile.readLines().forEach {line ->
+            val w = line.trim()
+            if(w.isEmpty() || w.startsWith('#') || w.startsWith("//")) return@forEach
+            val parts = w.split('=', limit =2)//cos we got the name on one side jey on the other
+            if(parts.size == 2) environment(parts[0].trim(), parts[1].trim())
+        }
+    }
+}
