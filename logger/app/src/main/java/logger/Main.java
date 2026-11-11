@@ -11,19 +11,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.sql.SQLException;
 
 public class Main {
 
     private static final DateTimeFormatter folderFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(java.time.ZoneOffset.UTC);//so for these two var's we get the current times because our design is going to be that raw data is split on an hourly basis with one folder containng an hours worth of raw data right, so this sets that up
     private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH'Z'").withZone(java.time.ZoneOffset.UTC);
     private static int requestId = 0; // Initialize requestId to 0
+    
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, IOException {
         
         String key = System.getenv("TFL_UNIFIED_API_KEY_PRIMARY");
         String dataDir = System.getenv("LOGGER_DATA_DIR");
         String dbFilePath = System.getenv("DB_FILE_PATH");
+        String lines = System.getenv("LOGGER_LINES");
 
+        if (lines == null){
+            System.err.println("Error: LoggerLines is NULL");
+            System.exit(1);}
         if (key == null || key.isEmpty()) {//guard to safely pull api key from env
             System.err.println("Error: TFL_UNIFIED_API_KEY_PRIMARY has failed");
             key = System.getenv("TFL_UNIFIED_API_KEY_SECONDARY");
@@ -40,22 +46,26 @@ public class Main {
         if (dbFilePath == null || dbFilePath.isEmpty()) {//guard to safely pull db file path from env
             System.err.println("Error: DB_FILE_PATH has failed");
             System.exit(1);}
+        Database db = new Database(dbFilePath);
+        if (db == null){
+            System.err.println("Error: DB is NULL");
+            System.exit(1);}
 
         
         
         HttpClient client = HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();//testing a fetch, victoria line seems most reliable so its the one that we are going to be testing i beliebve this was in the decisions log aready at some point
         HttpRequest request = HttpRequest.newBuilder()
                 .timeout(java.time.Duration.ofSeconds(10))
-                .uri(URI.create("https://api.tfl.gov.uk/Line/victoria/Arrivals?app_key=" + key))
+                .uri(URI.create("https://api.tfl.gov.uk/Line/"+ lines +"/Arrivals?app_key=" + key))
                 .build();
         
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();//scheduler that we are gna be using to poll the func logandsave
-        scheduler.scheduleAtFixedRate(() -> logAndSave(client, request, dataDir), 0, 30, TimeUnit.SECONDS);//polling it eevry 30 seconds
+        scheduler.scheduleAtFixedRate(() -> logAndSave(client, request, dataDir, db), 0, 30, TimeUnit.SECONDS);//polling it eevry 30 seconds
 
 
     }
 
-    public static void logAndSave(HttpClient client, HttpRequest request, String dataDir){
+    public static void logAndSave(HttpClient client, HttpRequest request, String dataDir, Database db){
         try {
             requestId++; 
             Instant sentTime = Instant.now();
@@ -105,8 +115,6 @@ public class Main {
                 catch(JsonProcessingException e){
                     System.err.println("Parse Error: " + e.getClass().getSimpleName());
                 }
-
-
             }
             else {
                 System.err.println("Error " + response.statusCode());
