@@ -9,6 +9,8 @@ import java.io.*;
 import java.util.zip.GZIPOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
+import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class Main {
 
@@ -45,6 +47,8 @@ public class Main {
         
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();//scheduler that we are gna be using to poll the func logandsave
         scheduler.scheduleAtFixedRate(() -> logAndSave(client, request, dataDir), 0, 30, TimeUnit.SECONDS);//polling it eevry 30 seconds
+
+
     }
 
     public static void logAndSave(HttpClient client, HttpRequest request, String dataDir){
@@ -88,7 +92,17 @@ public class Main {
             
                 catch (IOException e) {
                     System.err.println("IOException occurred while writing to file: " + e.getMessage());
-                }  
+                }
+
+                try{
+                    List<Prediction> predictions = Parser.parsePrediction(response.body());
+                    System.out.println("Parsed " + predictions.size() + " predictions");
+                }
+                catch(JsonProcessingException e){
+                    System.err.println("Parse Error: " + e.getClass().getSimpleName());
+                }
+
+
             }
             else {
                 System.err.println("Error " + response.statusCode());

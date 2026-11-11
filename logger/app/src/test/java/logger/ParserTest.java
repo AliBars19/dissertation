@@ -19,10 +19,12 @@ class ParserTest {
 
     @BeforeAll
     static void load() throws IOException {
-        InputStream inputStream = ParserTest.class.getResourceAsStream("/predictions-sample.json");//load the sample json file from resources folder this happens before every test hence @beeforeall
-        String json = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);//read the bytes and convert to string
-        predictions = Parser.parsePrediction(json);//parse the json string into a list of prediction records
-        
+        try(InputStream inputStream = ParserTest.class.getResourceAsStream("/predictions-sample.json")){//load the sample json file from resources folder this happens before every test hence @beeforeall}{
+            String json = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);//read the bytes and convert to string
+            predictions = Parser.parsePrediction(json);//parse the json string into a list of prediction records
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
