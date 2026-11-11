@@ -31,19 +31,18 @@ public class Main {
                 System.err.println("Error: TFL_UNIFIED_API_KEY_SECONDARY has failed");
                 System.exit(1);
             }
-            
-        }
+            }
 
         if (dataDir == null || dataDir.isEmpty()) {//guard to safely pull data dir from env
             System.err.println("Error: LOGGER_DATA_DIR has failed");
-            System.exit(1);
-        }
+            System.exit(1);}
 
         if (dbFilePath == null || dbFilePath.isEmpty()) {//guard to safely pull db file path from env
             System.err.println("Error: DB_FILE_PATH has failed");
-            System.exit(1);
-        }
+            System.exit(1);}
 
+        
+        
         HttpClient client = HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();//testing a fetch, victoria line seems most reliable so its the one that we are going to be testing i beliebve this was in the decisions log aready at some point
         HttpRequest request = HttpRequest.newBuilder()
                 .timeout(java.time.Duration.ofSeconds(10))
