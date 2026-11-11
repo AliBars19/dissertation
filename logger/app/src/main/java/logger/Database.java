@@ -62,23 +62,35 @@ public class Database {
     }
 
 
-    public void lineId(String tflLine){
-
+    public int lineId(String tflLine){
+        String insertSQL = "INSERT OR IGNORE INTO lines(tfl_line) VALUES (?)";
+        String selectSQL = "SELECT line_id FROM lines WHERE tfl_line = ?";
+        int ret = getOrCreate(tflLine,lineIds,insertSQL,selectSQL);
+        return ret;
     }
 
     public void stationId(String naptanID, String name){
 
     }
 
-    public void platformId(String name){
-
+    public int platformId(String name){
+        String insertSQL = "INSERT OR IGNORE INTO platforms(name) VALUES(?)";
+        String selectSQL = "SELECT platform_id FROM platforms WHERE name = ?";
+        int ret = getOrCreate(name,platformIds,insertSQL,selectSQL);
+        return ret;
     }
 
-    public void towardsId(String name){
-
+    public int towardsId(String name){
+        String insertSQL = "INSERT OR IGNORE INTO towards(name) VALUES (?)";
+        String selectSQL = "SELECT towards_id FROM towards WHERE name = ?";
+        int ret = getOrCreate(name,towardsIds,insertSQL,selectSQL);
+        return ret;
     }
 
-    public void locationId(String name){
-
+    public Integer locationId(String name){
+        String insertSQL = "INSERT OR IGNORE INTO locations(name) VALUES (?)";
+        String selectSQL = "SELECT location_id FROM locations WHERE name = ?";
+        int ret = getOrCreate(name,locationIds,insertSQL,selectSQL);
+        return ret;
     }
 }
