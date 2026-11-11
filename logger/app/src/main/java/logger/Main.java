@@ -22,6 +22,7 @@ public class Main {
         
         String key = System.getenv("TFL_UNIFIED_API_KEY_PRIMARY");
         String dataDir = System.getenv("LOGGER_DATA_DIR");
+        String dbFilePath = System.getenv("DB_FILE_PATH");
 
         if (key == null || key.isEmpty()) {//guard to safely pull api key from env
             System.err.println("Error: TFL_UNIFIED_API_KEY_PRIMARY has failed");
@@ -38,6 +39,10 @@ public class Main {
             System.exit(1);
         }
 
+        if (dbFilePath == null || dbFilePath.isEmpty()) {//guard to safely pull db file path from env
+            System.err.println("Error: DB_FILE_PATH has failed");
+            System.exit(1);
+        }
 
         HttpClient client = HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();//testing a fetch, victoria line seems most reliable so its the one that we are going to be testing i beliebve this was in the decisions log aready at some point
         HttpRequest request = HttpRequest.newBuilder()
