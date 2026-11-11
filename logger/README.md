@@ -20,7 +20,7 @@ Each step ends with a check that must pass before I start the next one.
    set up with `gradle init`, template extras removed. Done.
 
 ### C. Build 
-8. **Fetch and save raw.** Set my own package and main class; add Jackson and `sqlite-jdbc` to
+8. **Fetch and save raw.**(DONE) Set my own package and main class; add Jackson and `sqlite-jdbc` to
    the build and record their versions in L-18 and L-19. The logger reads the key from the
    environment, requests the Victoria line every 30 seconds with a 10-second limit, and appends each
    response as one line (starting with its `request_id` and `sent_at`) to the current UTC hour's

@@ -62,6 +62,12 @@ public class Main {
             
             if(response.statusCode() == 200) {
                 System.out.println("200 OK");
+
+                if( response.body().isEmpty() || response.body().charAt(0) != '[' || response.body().contains("\n")) {//this is to check that the response is healthy and so that we can parse it 
+                    System.err.println("Error: Response body is not a valid JSON array or is empty or contains newlines");
+                    return;
+                } 
+
                 String line = //this is one line of our response of what were gna save
                     "{\"request_id\":" + requestId + ",\"sent_at\":\"" +
                     sentTime.toString() +
