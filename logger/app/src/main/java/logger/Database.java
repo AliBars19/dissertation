@@ -63,6 +63,25 @@ public class Database {
         return id;
     }
 
+    public int insertRequest(String sentAt, String receivedAt, Integer httpStatus, Integer bytes, Integer recordCount, String tflNewestTimestamp, String error, String rawFile, String lines)  throws SQLException{
+        String insertSQL = ("INSERT INTO tflrequests(sent_at, received_at, http_status, bytes, record_count, tfl_newest_timestamp, error, raw_file, lines) VALUES(?,?,?,?,?,?,?,?,?) RETURNING request_id");//exec query cos of the RETURNING at the end of sql
+        try(PreparedStatement insert = con.prepareStatement(insertSQL)){
+            insert.setObject(1,sentAt);//point of this function is to keep track of our global counter for requesti_id
+            insert.setObject(2,receivedAt);
+            insert.setObject(3,httpStatus);
+            insert.setObject(4,bytes);
+            insert.setObject(5,recordCount);
+            insert.setObject(6,tflNewestTimestamp);
+            insert.setObject(7,error);
+            insert.setObject(8,rawFile);
+            insert.setObject(9,lines);
+            try(ResultSet rs = insert.executeQuery()){
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+    }
+
     public int lineId(String tflLine)throws SQLException{
         String insertSQL = "INSERT OR IGNORE INTO lines(tfl_line) VALUES (?)";
         String selectSQL = "SELECT line_id FROM lines WHERE tfl_line = ?";

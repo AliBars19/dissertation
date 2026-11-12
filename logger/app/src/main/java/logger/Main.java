@@ -19,7 +19,6 @@ public class Main {
     private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH'Z'").withZone(java.time.ZoneOffset.UTC);
     private static int requestId = 0; // Initialize requestId to 0
     
-
     public static void main(String[] args) throws SQLException, IOException {
         
         String key = System.getenv("TFL_UNIFIED_API_KEY_PRIMARY");
