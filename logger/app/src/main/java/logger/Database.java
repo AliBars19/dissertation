@@ -52,7 +52,7 @@ public class Database {
         try(PreparedStatement select = con.prepareStatement(selectSQL)){
             select.setString(1, text);
             try(ResultSet rs = select.executeQuery()){
-                rs.next()//goes down one row so instead of the text its now looking at the value(number)
+                rs.next();//goes down one row so instead of the text its now looking at the value(number)
                 id = rs.getInt(1);//selects the first row fo the column its looking at, this is the ID. there will ONLY be one row
             }
         }
@@ -62,35 +62,35 @@ public class Database {
     }
 
 
-    public int lineId(String tflLine){
+    public int lineId(String tflLine)throws SQLException{
         String insertSQL = "INSERT OR IGNORE INTO lines(tfl_line) VALUES (?)";
         String selectSQL = "SELECT line_id FROM lines WHERE tfl_line = ?";
         int ret = getOrCreate(tflLine,lineIds,insertSQL,selectSQL);
         return ret;
     }
 
-    public void stationId(String naptanID, String name){
+    public void stationId(String naptanID, String name)throws SQLException{
 
     }
 
-    public int platformId(String name){
+    public int platformId(String name)throws SQLException{
         String insertSQL = "INSERT OR IGNORE INTO platforms(name) VALUES(?)";
         String selectSQL = "SELECT platform_id FROM platforms WHERE name = ?";
         int ret = getOrCreate(name,platformIds,insertSQL,selectSQL);
         return ret;
     }
 
-    public int towardsId(String name){
+    public int towardsId(String name)throws SQLException{
         String insertSQL = "INSERT OR IGNORE INTO towards(name) VALUES (?)";
         String selectSQL = "SELECT towards_id FROM towards WHERE name = ?";
         int ret = getOrCreate(name,towardsIds,insertSQL,selectSQL);
         return ret;
     }
 
-    public Integer locationId(String name){
+    public Integer locationId(String name)throws SQLException{
         String insertSQL = "INSERT OR IGNORE INTO locations(name) VALUES (?)";
         String selectSQL = "SELECT location_id FROM locations WHERE name = ?";
-        int ret = getOrCreate(name,locationIds,insertSQL,selectSQL);
+        Integer ret = getOrCreate(name,locationIds,insertSQL,selectSQL);
         return ret;
     }
 }
