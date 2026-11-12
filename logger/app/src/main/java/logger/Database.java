@@ -34,63 +34,67 @@ public class Database {
         con.close();
     }
 
-    private Integer getOrCreate(String text, HashMap<String, Integer> map, String insertSQL, String selectSQL)throws SQLException{
+    private Integer getOrCreate(String key, HashMap<String, Integer> map, String insertSQL, String selectSQL, String... values)throws SQLException{//reason why its  string... is cos we need multipple values in there and that datatype is like an array of strings basically.
         //Purpose of this function is to check if the one piece of text from one line of the JSON exists or not. if exists cool if not you get
-        if(text == null){
+        if(key == null){
             return null;//protects from values that TFL have left out
         }
-        Integer id = map.get(text); //reason why im using Integer and not int is for null values
+        Integer id = map.get(key); //reason why im using Integer and not int is for null values
         if(id != null){
             return id;
         }
 
         try(PreparedStatement insert = con.prepareStatement(insertSQL)){
-            insert.setString(1, text);
+            for(int i = 0; i<values.length; i++){//heavy futureproofing right here 
+                insert.setString(1+i, values[i]);
+            }
             insert.executeUpdate();
         }
 
         try(PreparedStatement select = con.prepareStatement(selectSQL)){
-            select.setString(1, text);
+            select.setString(1, key);
             try(ResultSet rs = select.executeQuery()){
                 rs.next();//goes down one row so instead of the text its now looking at the value(number)
                 id = rs.getInt(1);//selects the first row fo the column its looking at, this is the ID. there will ONLY be one row
             }
         }
 
-        map.put(text,id);//write it to the cache
+        map.put(key,id);//write it to the cache
         return id;
     }
-
 
     public int lineId(String tflLine)throws SQLException{
         String insertSQL = "INSERT OR IGNORE INTO lines(tfl_line) VALUES (?)";
         String selectSQL = "SELECT line_id FROM lines WHERE tfl_line = ?";
-        int ret = getOrCreate(tflLine,lineIds,insertSQL,selectSQL);
+        int ret = getOrCreate(tflLine,lineIds,insertSQL,selectSQL, tflLine);
         return ret;
     }
 
-    public void stationId(String naptanID, String name)throws SQLException{
-
+    public Integer stationId(String naptanID, String name)throws SQLException{
+        String insertSQL = "INSERT OR IGNORE INTO stations(naptan_id, name) VALUES (?, ?)";
+        String selectSQL = "SELECT station_id FROM stations WHERE naptan_id = ?";
+        Integer ret = getOrCreate(naptanID, stationIds,insertSQL,selectSQL, naptanID,name);
+        return ret;
     }
 
     public int platformId(String name)throws SQLException{
         String insertSQL = "INSERT OR IGNORE INTO platforms(name) VALUES(?)";
         String selectSQL = "SELECT platform_id FROM platforms WHERE name = ?";
-        int ret = getOrCreate(name,platformIds,insertSQL,selectSQL);
+        int ret = getOrCreate(name,platformIds,insertSQL,selectSQL,name);
         return ret;
     }
 
     public int towardsId(String name)throws SQLException{
         String insertSQL = "INSERT OR IGNORE INTO towards(name) VALUES (?)";
         String selectSQL = "SELECT towards_id FROM towards WHERE name = ?";
-        int ret = getOrCreate(name,towardsIds,insertSQL,selectSQL);
+        int ret = getOrCreate(name,towardsIds,insertSQL,selectSQL,name);
         return ret;
     }
 
     public Integer locationId(String name)throws SQLException{
         String insertSQL = "INSERT OR IGNORE INTO locations(name) VALUES (?)";
         String selectSQL = "SELECT location_id FROM locations WHERE name = ?";
-        Integer ret = getOrCreate(name,locationIds,insertSQL,selectSQL);
+        Integer ret = getOrCreate(name,locationIds,insertSQL,selectSQL,name);
         return ret;
     }
 }
