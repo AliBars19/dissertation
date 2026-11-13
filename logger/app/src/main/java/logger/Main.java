@@ -68,11 +68,7 @@ public class Main {
         
         try {
 
-            String folderName = folderFormatter.format(sentTime);
-            String fileName = fileFormatter.format(sentTime) + ".jsonl.gz";//jsonl.gz because file will be zipped for compression and jsonl because each line is a seperate json object that will be parsed later on.
-            Path filePath = Paths.get(dataDir, "raw", folderName, fileName);//this is the path to the folder that we are going to be creating, it will be in the data dir, then raw, then the folder name which is the date, then the file name which is the date and hour ezpz
-            Files.createDirectories(filePath.getParent());
-            System.out.println("Folder created: " + filePath);
+            Path filePath = rawFilePath(dataDir, sentTime);
 
             Integer recordCount = null;
             String tflNewest = null;
@@ -80,12 +76,13 @@ public class Main {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             Instant receivedAt = Instant.now();
 
-            if(response.statusCode() >= 200 && response.statusCode() <= 300) {
-                System.out.println("200 OK");
-                if( response.body().isEmpty() || response.body().charAt(0) != '[' || response.body().contains("\n")) {//this is to check that the response is healthy and so that we can parse it 
-                    System.err.println("Error: Response body is not a valid JSON array or is empty or contains newlines");
+            if(response.statusCode() >= 200 && response.statusCode() < 300) {
+                System.out.println(response.statusCode() + " OK");
+                
+                if(!isUsableBody(response.body())){
+                    recordFailure(db, sentTime, receivedAt, response.statusCode(), "Bad body", lines);
                     return;
-                } 
+                }
 
                 int bytes = response.body().getBytes().length;
 
@@ -101,43 +98,74 @@ public class Main {
 
                 int requestId = db.insertRequest(sentTime.toString(), receivedAt.toString(), response.statusCode(), bytes, recordCount, tflNewest, null, filePath.toString(), lines);
 
-                String line = //this is one line of our response of what were gna save
-                    "{\"request_id\":" + requestId + ",\"sent_at\":\"" +
-                    sentTime.toString() +
-                    "\",\"response_body\":" +//this is building each line of the string one by one this is js a test for now
-                    response.body() +
-                    "}";
-                try (
-                    BufferedWriter writer = 
-                        new BufferedWriter(
-                        new OutputStreamWriter(//this turns text to utf8 for json
-                        new GZIPOutputStream(//these really messy looking lines are just to make sure that the file is written in a compressed format so that we can save space and not have to worry about running out of space on the server this is important because we are going to be logging a lot of data i mean a LOT of data, two weeks worth.
-                        new FileOutputStream(filePath.toFile(), true)), StandardCharsets.UTF_8)))
-                    {
-                        writer.write(line);
-                        writer.write("\n");
-                        System.out.println("saved to" + filePath);
-                    }
-                catch (IOException e) {
-                    System.err.println("IOException occurred while writing to file: " + e.getMessage());
-                }
+                writeRawLine(filePath, requestId, sentTime, response.body());
+
+                
+
 
                 
             }
             else {
                 System.err.println("Error " + response.statusCode());
-                recordFailure(db, sentTime,response.statusCode(),lines);            
+                recordFailure(db, sentTime,receivedAt,response.statusCode(),"HTTP " + response.statusCode(),lines);            
             }
-            System.out.println("Size of the response body: " + response.body().getBytes().length + " bytes");
-            
-        } catch (InterruptedException | IOException e) {//the client.send can return errors so we gotta catch them aswell or this will not compile java wont allow us to 
-            System.err.println("IOException or InterruptedException " + e.getClass().getSimpleName() + " occurred");
-        }catch (RuntimeException e) {
-            System.err.println("An unexpected error occurred: " + e.getMessage());
+        } 
+        catch (InterruptedException | IOException | SQLException e) {//the client.send can return errors so we gotta catch them aswell or this will not compile java wont allow us to 
+            System.err.println("IOException or InterruptedException or SQLException" + e.getClass().getSimpleName() + " occurred");
+            recordFailure(db, sentTime,null,null, e.getClass().getSimpleName(),lines);
+            }
+        catch (RuntimeException e) {
+            System.err.println("An unexpected error occurred: " + e.getClass().getSimpleName());
+            recordFailure(db, sentTime,null,null, e.getClass().getSimpleName(),lines);        
         }
     }
 
-    public static void recordFailure(Database db, Instant sentTIme, String error, String lines ){
-        db.insertRequest(sentTime.toString(), receivedAt.toString(), response.statusCode(), null, null, null, "Bad Body", null, lines);//building a failed fetch
+    public static void recordFailure(Database db, Instant sentTime, Instant receivedAt, Integer httpStatus,String error, String lines ){
+        try{
+            db.insertRequest(sentTime.toString(), receivedAt ==null ? null : receivedAt.toString(), httpStatus, null, null, null, error, null, lines);//building a failed fetch
+        }
+        catch (SQLException e){
+            System.err.println("Couldnt record failure: " + e.getClass().getSimpleName());
+        }
+    }
+
+    private static boolean isUsableBody(String body){
+        if(body.isEmpty() || body.charAt(0) != '[' || body.contains("\n")) {//this is to check that the response is healthy and so that we can parse it 
+            System.err.println("Error: Response body is not a valid JSON array or is empty or contains newlines");
+            return false;
+        }
+        return true; 
+    }
+
+    public static Path rawFilePath(String dataDir, Instant sentTime) throws IOException{
+        String folderName = folderFormatter.format(sentTime);
+        String fileName = fileFormatter.format(sentTime) + ".jsonl.gz";//jsonl.gz because file will be zipped for compression and jsonl because each line is a seperate json object that will be parsed later on.
+        Path filePath = Paths.get(dataDir, "raw", folderName, fileName);//this is the path to the folder that we are going to be creating, it will be in the data dir, then raw, then the folder name which is the date, then the file name which is the date and hour ezpz
+        Files.createDirectories(filePath.getParent());
+        return filePath;
+    }
+
+    public static void writeRawLine(Path filePath, int requestId, Instant sentTime, String body){
+        String line = //this is one line of our response of what were gna save
+                    "{\"request_id\":" + requestId + ",\"sent_at\":\"" +
+                    sentTime.toString() +
+                    "\",\"response_body\":" +//this is building each line of the string one by one this is js a test for now
+                    body +
+                    "}";
+        
+        try (
+            BufferedWriter writer = 
+            new BufferedWriter(
+            new OutputStreamWriter(//this turns text to utf8 for json
+            new GZIPOutputStream(//these really messy looking lines are just to make sure that the file is written in a compressed format so that we can save space and not have to worry about running out of space on the server this is important because we are going to be logging a lot of data i mean a LOT of data, two weeks worth.
+            new FileOutputStream(filePath.toFile(), true)), StandardCharsets.UTF_8)))
+            {
+            writer.write(line);
+            writer.write("\n");
+            System.out.println("saved to" + filePath);
+        }
+        catch (IOException e) {
+            System.err.println("IOException occurred while writing to file: " + e.getClass().getSimpleName());
+        }
     }
 }
