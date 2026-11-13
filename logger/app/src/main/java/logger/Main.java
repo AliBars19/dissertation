@@ -17,7 +17,6 @@ public class Main {
 
     private static final DateTimeFormatter folderFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(java.time.ZoneOffset.UTC);//so for these two var's we get the current times because our design is going to be that raw data is split on an hourly basis with one folder containng an hours worth of raw data right, so this sets that up
     private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH'Z'").withZone(java.time.ZoneOffset.UTC);
-    private static int requestId = 0; // Initialize requestId to 0
     
     public static void main(String[] args) throws SQLException, IOException {
         
@@ -59,15 +58,15 @@ public class Main {
                 .build();
         
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();//scheduler that we are gna be using to poll the func logandsave
-        scheduler.scheduleAtFixedRate(() -> logAndSave(client, request, dataDir, db), 0, 30, TimeUnit.SECONDS);//polling it eevry 30 seconds
+        scheduler.scheduleAtFixedRate(() -> logAndSave(client, request, dataDir, db, lines), 0, 30, TimeUnit.SECONDS);//polling it eevry 30 seconds
 
 
     }
 
-    public static void logAndSave(HttpClient client, HttpRequest request, String dataDir, Database db){
+    public static void logAndSave(HttpClient client, HttpRequest request, String dataDir, Database db, String lines){
+        Instant sentTime = Instant.now();
+        
         try {
-            requestId++; 
-            Instant sentTime = Instant.now();
 
             String folderName = folderFormatter.format(sentTime);
             String fileName = fileFormatter.format(sentTime) + ".jsonl.gz";//jsonl.gz because file will be zipped for compression and jsonl because each line is a seperate json object that will be parsed later on.
@@ -75,15 +74,32 @@ public class Main {
             Files.createDirectories(filePath.getParent());
             System.out.println("Folder created: " + filePath);
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            
-            if(response.statusCode() == 200) {
-                System.out.println("200 OK");
+            Integer recordCount = null;
+            String tflNewest = null;
 
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            Instant receivedAt = Instant.now();
+
+            if(response.statusCode() >= 200 && response.statusCode() <= 300) {
+                System.out.println("200 OK");
                 if( response.body().isEmpty() || response.body().charAt(0) != '[' || response.body().contains("\n")) {//this is to check that the response is healthy and so that we can parse it 
                     System.err.println("Error: Response body is not a valid JSON array or is empty or contains newlines");
                     return;
                 } 
+
+                int bytes = response.body().getBytes().length;
+
+                try{
+                    List<Prediction> predictions = Parser.parsePrediction(response.body());
+                    System.out.println("Parsed " + predictions.size() + " predictions");
+                    recordCount = predictions.size();
+                    tflNewest = predictions.isEmpty() ? null : predictions.get(0).timestamp();
+                }
+                catch(JsonProcessingException e){
+                    System.err.println("Parse Error: " + e.getClass().getSimpleName());
+                }
+
+                int requestId = db.insertRequest(sentTime.toString(), receivedAt.toString(), response.statusCode(), bytes, recordCount, tflNewest, null, filePath.toString(), lines);
 
                 String line = //this is one line of our response of what were gna save
                     "{\"request_id\":" + requestId + ",\"sent_at\":\"" +
@@ -102,21 +118,15 @@ public class Main {
                         writer.write("\n");
                         System.out.println("saved to" + filePath);
                     }
-            
                 catch (IOException e) {
                     System.err.println("IOException occurred while writing to file: " + e.getMessage());
                 }
 
-                try{
-                    List<Prediction> predictions = Parser.parsePrediction(response.body());
-                    System.out.println("Parsed " + predictions.size() + " predictions");
-                }
-                catch(JsonProcessingException e){
-                    System.err.println("Parse Error: " + e.getClass().getSimpleName());
-                }
+                
             }
             else {
                 System.err.println("Error " + response.statusCode());
+                recordFailure(db, sentTime,response.statusCode(),lines);            
             }
             System.out.println("Size of the response body: " + response.body().getBytes().length + " bytes");
             
@@ -125,5 +135,9 @@ public class Main {
         }catch (RuntimeException e) {
             System.err.println("An unexpected error occurred: " + e.getMessage());
         }
+    }
+
+    public static void recordFailure(Database db, Instant sentTIme, String error, String lines ){
+        db.insertRequest(sentTime.toString(), receivedAt.toString(), response.statusCode(), null, null, null, "Bad Body", null, lines);//building a failed fetch
     }
 }
