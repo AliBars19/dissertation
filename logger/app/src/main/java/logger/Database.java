@@ -116,4 +116,36 @@ public class Database {
         Integer ret = getOrCreate(name,locationIds,insertSQL,selectSQL,name);
         return ret;
     }
+
+    public void insertPrediction(int requestId, Prediction p) throws SQLException{//actually inserting all the data we've organised into the sqlite in the tflresponses table
+        Integer stationId = stationId(p.naptanId(),p.stationName());
+        Integer destinationStation = stationId(p.destinationNaptanId(), p.destinationName());
+        Integer locationId = locationId(p.currentLocation());
+        Integer timeToStation = p.timeToStation();
+        
+        int towardsId = towardsId(p.towards());
+        int platformId = platformId(p.platformName());
+        int lineId = lineId(p.lineId());
+        
+        String expectedArrival = p.expectedArrival();
+        String vehicleId = p.vehicleId();
+        String SQL = "INSERT INTO tflresponses(request_Id, vehicle_Id, line_Id, station_id, platform_id,direction,destination_station_id, towards_id,location_id,time_to_station,expected_arrival) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+        String direction = p.direction();      
+
+        try(PreparedStatement select = con.prepareStatement(SQL)){
+            select.setObject(1,requestId);
+            select.setObject(2, vehicleId);
+            select.setObject(3,lineId);
+            select.setObject(4,stationId);
+            select.setObject(5,platformId);
+            select.setObject(6,direction);
+            select.setObject(7,destinationStation);
+            select.setObject(8,towardsId);
+            select.setObject(9,locationId);
+            select.setObject(10,timeToStation);
+            select.setObject(11,expectedArrival);
+
+            select.executeUpdate();
+        }
+    }
 }
