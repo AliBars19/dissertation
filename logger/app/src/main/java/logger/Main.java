@@ -85,9 +85,11 @@ public class Main {
                 }
 
                 int bytes = response.body().getBytes().length;
+                List<Prediction> predictions = null;
 
                 try{
-                    List<Prediction> predictions = Parser.parsePrediction(response.body());
+                    
+                    predictions = Parser.parsePrediction(response.body());
                     System.out.println("Parsed " + predictions.size() + " predictions");
                     recordCount = predictions.size();
                     tflNewest = predictions.isEmpty() ? null : predictions.get(0).timestamp();
@@ -99,6 +101,10 @@ public class Main {
                 int requestId = db.insertRequest(sentTime.toString(), receivedAt.toString(), response.statusCode(), bytes, recordCount, tflNewest, null, filePath.toString(), lines);
 
                 writeRawLine(filePath, requestId, sentTime, response.body());
+
+                if(predictions !=null){
+                    db.insertMultiplePredictions(requestId, predictions);
+                }
             }
             else {
                 System.err.println("Error " + response.statusCode());

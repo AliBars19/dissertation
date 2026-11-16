@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 
 public class Database {
 
@@ -124,7 +125,7 @@ public class Database {
         Integer timeToStation = p.timeToStation();
         
         int towardsId = towardsId(p.towards());
-        int platformId = platformId(p.platformName());
+        int platformId = platformId(p.platformName());//pulling all of the data for one prediction to parse it through our sqlite to record it
         int lineId = lineId(p.lineId());
         
         String expectedArrival = p.expectedArrival();
@@ -133,7 +134,7 @@ public class Database {
         String direction = p.direction();      
 
         try(PreparedStatement select = con.prepareStatement(SQL)){
-            select.setObject(1,requestId);
+            select.setObject(1,requestId);//setting 
             select.setObject(2, vehicleId);
             select.setObject(3,lineId);
             select.setObject(4,stationId);
@@ -146,6 +147,23 @@ public class Database {
             select.setObject(11,expectedArrival);
 
             select.executeUpdate();
+        }
+    }
+
+    public void insertMultiplePredictions(int requestId, List<Prediction> predictions ) throws SQLException{
+        con.setAutoCommit(false);//were going to commit every sqlite row one by one to save time at the expense of a little space. this is so we dont committ malformed lines
+        try{
+            for(Prediction p : predictions){
+                insertPrediction(requestId, p);
+            }
+            con.commit();//commit it just like github ykwim
+        }
+        catch(SQLException e){
+            con.rollback();
+            System.err.println("SQLException" + e.getClass().getSimpleName());
+            throw e;
+        } finally{
+            con.setAutoCommit(true);
         }
     }
 }
