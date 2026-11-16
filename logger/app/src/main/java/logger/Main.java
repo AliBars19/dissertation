@@ -99,11 +99,6 @@ public class Main {
                 int requestId = db.insertRequest(sentTime.toString(), receivedAt.toString(), response.statusCode(), bytes, recordCount, tflNewest, null, filePath.toString(), lines);
 
                 writeRawLine(filePath, requestId, sentTime, response.body());
-
-                
-
-
-                
             }
             else {
                 System.err.println("Error " + response.statusCode());
