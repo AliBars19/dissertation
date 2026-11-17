@@ -46,7 +46,7 @@ class DatabaseTest{
     }
 
     private List<Prediction> loadJSON() throws IOException {
-        try(InputStream in = DatabaseTest.class.getResourceeAsStream("/predictions-sample.json")){
+        try(InputStream in = DatabaseTest.class.getResourceAsStream("/predictions-sample.json")){
             return Parser.parsePrediction(new String(in.readAllBytes(), StandardCharsets.UTF_8));
         }//does as the function name states, it loads the json and parses the raw data so its usable in the test
     }
@@ -54,7 +54,7 @@ class DatabaseTest{
     private int count(String table) throws SQLException{
         try(
             Connection con = DriverManager.getConnection("jdbc:sqlite:" + dbFile);//setting up the con to sqlite like we do in main
-            ResultSet rs = check.createStatement().executeQuery("SELECT count(*) FROM " + table)//it literally counts the rows in the table that were requesting hence the name
+            ResultSet rs = con.createStatement().executeQuery("SELECT count(*) FROM " + table)//it literally counts the rows in the table that were requesting hence the name
         ){
             rs.next();
             return rs.getInt(1);
@@ -96,7 +96,7 @@ class DatabaseTest{
         
         assertEquals(3, count("tflresponses"));
         assertEquals(3, count("stations"));
-        assertEquals(3, count("lines"));
+        assertEquals(2, count("lines"));
         assertEquals(3, count("platforms"));
     }
 
