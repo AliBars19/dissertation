@@ -29,7 +29,7 @@ Each step ends with a check that must pass before I start the next one.
 9. **Parse.** (DONE) Turn each response into prediction records, keeping only the fields in D-022.
    *Check:* unit tests pass on saved responses, including one with empty `direction` and
    `destinationNaptanId`.
-10. **Write to SQLite.** Create the tables from `schema.sql`, switch on foreign keys for each
+10. **Write to SQLite.** (done)Create the tables from `schema.sql`, switch on foreign keys for each
     connection, fill the lookup tables as new values appear, and write `tflrequests` and
     `tflresponses` rows.
     *Check:* row counts match the record counts, and every ID points to a real lookup row.
