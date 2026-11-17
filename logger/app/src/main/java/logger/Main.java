@@ -17,7 +17,8 @@ public class Main {
 
     private static final DateTimeFormatter folderFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(java.time.ZoneOffset.UTC);//so for these two var's we get the current times because our design is going to be that raw data is split on an hourly basis with one folder containng an hours worth of raw data right, so this sets that up
     private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH'Z'").withZone(java.time.ZoneOffset.UTC);
-    
+    private static final DateTimeFormatter logFormatter = DateTimeFormatter.ofPattern("HH:mm:ss'Z'").withZone(java.time.ZoneOffset.UTC);
+
     public static void main(String[] args) throws SQLException, IOException {
         
         String key = System.getenv("TFL_UNIFIED_API_KEY_PRIMARY");
@@ -77,8 +78,7 @@ public class Main {
             Instant receivedAt = Instant.now();
 
             if(response.statusCode() >= 200 && response.statusCode() < 300) {
-                System.out.println(response.statusCode() + " OK");
-                
+
                 if(!isUsableBody(response.body())){
                     recordFailure(db, sentTime, receivedAt, response.statusCode(), "Bad body", lines);
                     return;
@@ -90,12 +90,11 @@ public class Main {
                 try{
                     
                     predictions = Parser.parsePrediction(response.body());
-                    System.out.println("Parsed " + predictions.size() + " predictions");
                     recordCount = predictions.size();
                     tflNewest = predictions.isEmpty() ? null : predictions.get(0).timestamp();
                 }
                 catch(JsonProcessingException e){
-                    System.err.println("Parse Error: " + e.getClass().getSimpleName());
+                    logError("Parse Error: " + e.getClass().getSimpleName());
                 }
 
                 int requestId = db.insertRequest(sentTime.toString(), receivedAt.toString(), response.statusCode(), bytes, recordCount, tflNewest, null, filePath.toString(), lines);
@@ -105,18 +104,19 @@ public class Main {
                 if(predictions !=null){
                     db.insertMultiplePredictions(requestId, predictions);
                 }
+                log("#" + requestId + " saved " + recordCount + " predictions (" + bytes/1024 + "KB)");
             }
             else {
-                System.err.println("Error " + response.statusCode());
+                logError("HTTP " + response.statusCode());
                 recordFailure(db, sentTime,receivedAt,response.statusCode(),"HTTP " + response.statusCode(),lines);            
             }
         } 
         catch (InterruptedException | IOException | SQLException e) {//the client.send can return errors so we gotta catch them aswell or this will not compile java wont allow us to 
-            System.err.println("IOException or InterruptedException or SQLException" + e.getClass().getSimpleName() + " occurred");
+            logError("Request Failed " + e.getClass().getSimpleName() + " occurred");
             recordFailure(db, sentTime,null,null, e.getClass().getSimpleName(),lines);
             }
         catch (RuntimeException e) {
-            System.err.println("An unexpected error occurred: " + e.getClass().getSimpleName());
+            logError("An unexpected error occurred: " + e.getClass().getSimpleName());
             recordFailure(db, sentTime,null,null, e.getClass().getSimpleName(),lines);        
         }
     }
@@ -126,13 +126,13 @@ public class Main {
             db.insertRequest(sentTime.toString(), receivedAt ==null ? null : receivedAt.toString(), httpStatus, null, null, null, error, null, lines);//building a failed fetch
         }
         catch (SQLException e){
-            System.err.println("Couldnt record failure: " + e.getClass().getSimpleName());
+            logError("Couldnt record failure: " + e.getClass().getSimpleName());
         }
     }
 
     private static boolean isUsableBody(String body){
         if(body.isEmpty() || body.charAt(0) != '[' || body.contains("\n")) {//this is to check that the response is healthy and so that we can parse it 
-            System.err.println("Error: Response body is not a valid JSON array or is empty or contains newlines");
+            logError("Error: Bad body");
             return false;
         }
         return true; 
@@ -163,10 +163,19 @@ public class Main {
             {
             writer.write(line);
             writer.write("\n");
-            System.out.println("saved to" + filePath);
         }
         catch (IOException e) {
-            System.err.println("IOException occurred while writing to file: " + e.getClass().getSimpleName());
+            logError("Error while writing to file: " + e.getClass().getSimpleName());
         }
+    }
+
+    //these two helper functions are going to be so logs are a litle more readable and clean up some code in the body of logandsave and in main aswell.
+
+    private static void log(String message){
+        System.out.println("[" + logFormatter.format(Instant.now())+"] " + message);
+    }
+
+    private static void logError(String message){
+        System.err.println("[" + logFormatter.format(Instant.now())+"] " + message);
     }
 }
