@@ -1,5 +1,25 @@
 package logger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
 class DatabaseTest{
     //in this file we'll be creating 'temporary' databases to work on 
 
@@ -25,7 +45,26 @@ class DatabaseTest{
         db.close();//closes the db after each test
     }
 
-    //some helper functions coming in here
+    private List<Prediction> loadJSON() throws IOException {
+        try(InputStream in = DatabaseTest.class.getResourceeAsStream("/predictions-sample.json")){
+            return Parser.parsePrediction(new String(in.readAllBytes(), StandardCharsets.UTF_8));
+        }//does as the function name states, it loads the json and parses the raw data so its usable in the test
+    }
+
+    private int count(String table) throws SQLException{
+        try(
+            Connection con = DriverManager.getConnection("jdbc:sqlite:" + dbFile);//setting up the con to sqlite like we do in main
+            ResultSet rs = check.createStatement().executeQuery("SELECT count(*) FROM " + table)//it literally counts the rows in the table that were requesting hence the name
+        ){
+            rs.next();
+            return rs.getInt(1);
+        }
+    }
+
+    private int newRequest() throws SQLException {
+        return db.insertRequest("2026-11-16T12:00:00Z", "2026-11-16T12:00:01Z", 200, 1000, 3,
+                "2026-11-16T11:59:10Z", null, "test.jsonl.gz", "victoria");
+    }
 
     @Test
     void overwriteTest() throws SQLException { 
@@ -52,7 +91,7 @@ class DatabaseTest{
 
     @Test
     void insertMultiplePredictionsTest() throws SQLException, IOException{
-        List<Prediction> p = loadFixture();
+        List<Prediction> p = loadJSON();
         db.insertMultiplePredictions(newRequest(), p);
         
         assertEquals(3, count("tflresponses"));
@@ -63,7 +102,7 @@ class DatabaseTest{
 
     @Test
     void insertMultiplePredictionsMalformedTest() throws SQLException, IOException{
-        List<Prediction> predictions = new ArrayList<>(loadFixture());
+        List<Prediction> predictions = new ArrayList<>(loadJSON());
         
         predictions.add(malformedRequest1);
         predictions.add(malformedRequest2);
