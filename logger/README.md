@@ -33,10 +33,10 @@ Each step ends with a check that must pass before I start the next one.
     connection, fill the lookup tables as new values appear, and write `tflrequests` and
     `tflresponses` rows.
     *Check:* row counts match the record counts, and every ID points to a real lookup row.
-11. **Gap and health logging.** Failed, timed-out, rate-limited and empty requests all get a
+11. **Gap and health logging.** (done) Failed, timed-out, rate-limited and empty requests all get a
     `tflrequests` row with the error.
     *Check:* with the network turned off for a minute, those requests appear as failed rows.
-12. **Survive failures.** One bad response, a timeout or a database error is logged and the logger
+12. **Survive failures.** (DONE) One bad response, a timeout or a database error is logged and the logger
     carries on with the next request.
     *Check:* feeding it broken JSON does not stop it.
 13. **Run as a service.** Build with `./gradlew installDist`, copy the result to the VPS, and run it

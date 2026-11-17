@@ -62,7 +62,18 @@ public class Main {
         
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();//scheduler that we are gna be using to poll the func logandsave
         scheduler.scheduleAtFixedRate(() -> logAndSave(client, request, dataDir, db, lines), 0, 30, TimeUnit.SECONDS);//polling it eevry 30 seconds
-
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log("Shutting Down");
+            scheduler.shutdown();
+            try{
+                scheduler.awaitTermination(15, TimeUnit.SECONDS);
+                db.close();
+            }
+            catch(InterruptedException | SQLException e){
+                logError("Shutdown problem: " + e.getClass().getSimpleName());
+            }
+            log("Stopped cleanly");
+        }));
 
     }
 
