@@ -158,7 +158,7 @@ public class Database {
             }
             con.commit();//commit it just like github ykwim
         }
-        catch(SQLException e){
+        catch(SQLException | RuntimeException e){
             con.rollback();
             System.err.println("SQLException" + e.getClass().getSimpleName());
             throw e;
