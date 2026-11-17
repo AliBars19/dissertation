@@ -19,6 +19,8 @@ public class Main {
     private static final DateTimeFormatter fileFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH'Z'").withZone(java.time.ZoneOffset.UTC);
     private static final DateTimeFormatter logFormatter = DateTimeFormatter.ofPattern("HH:mm:ss'Z'").withZone(java.time.ZoneOffset.UTC);
 
+    private static int consecutiveFailures = 0;
+
     public static void main(String[] args) throws SQLException, IOException {
         
         String key = System.getenv("TFL_UNIFIED_API_KEY_PRIMARY");
@@ -105,6 +107,12 @@ public class Main {
                     db.insertMultiplePredictions(requestId, predictions);
                 }
                 log("#" + requestId + " saved " + recordCount + " predictions (" + bytes/1024 + "KB)");
+
+                if(consecutiveFailures > 10){
+                    log("Logger failed " + consecutiveFailures + " times, it is now back to 0");
+                    
+                }
+                consecutiveFailures = 0;
             }
             else {
                 logError("HTTP " + response.statusCode());
@@ -122,6 +130,10 @@ public class Main {
     }
 
     public static void recordFailure(Database db, Instant sentTime, Instant receivedAt, Integer httpStatus,String error, String lines ){
+        consecutiveFailures++;
+        if(consecutiveFailures > 10){
+           logError("WARNING " + consecutiveFailures + " FAILURES IN A ROW ");
+        }
         try{
             db.insertRequest(sentTime.toString(), receivedAt ==null ? null : receivedAt.toString(), httpStatus, null, null, null, error, null, lines);//building a failed fetch
         }
