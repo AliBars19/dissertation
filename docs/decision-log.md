@@ -248,6 +248,14 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   depend on it, and all times are stored in UTC. The TfL API key lives in an environment variable or
   a config file on the VPS, never in the repo. Free disk space on the VPS limits how much raw data I
   keep (D-020).
+- **Update 2026-11-19:** How it is deployed, since 2026-11-17. I build it on the VPS from the repo with
+  `./gradlew installDist` and run the start script as a systemd service (`tfl-logger.service`) with
+  `Restart=always` (10 seconds) and a 30-second stop timeout, so it survives logouts, crashes and
+  reboots, and its shutdown hook finishes the current request before it stops. Its settings, including
+  the API keys, are in `~/tfl-logger.env`, outside the repo so `git pull`
+  cannot touch them. Data lives in `~/tfl-data/`. To update it: `git pull`, `./gradlew installDist`,
+  `sudo systemctl restart tfl-logger`.
+  During the 48-hour run the data was in `~/dissertation/data/`, inside the repo folder
 
 ## D-020: Main dataset is two full weeks of the whole network
 - **Date:** 2026-11-06 · **Status:** DECIDED · **Decided by:** me
@@ -319,6 +327,11 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   previous request are stored; what counts as "changed", and the request interval, are set from the
   pilot. Indexes are chosen after the pilot, once the real size and queries are known. The patterns
   above come from one response, so the pilot checks that they hold.
+- **Update 2026-11-19:** Storing only changed predictions is dropped: the logger stores every prediction.
+  The 48-hour run measured about 47 MB a day for the Victoria line (36 MB raw files and 55 MB of
+  database over 45.7 hours, about 58 bytes per prediction). Scaled to all 11 lines, about 700 MB a day,
+  or 8 to 12 GB for two weeks, which fits the VPS. Keeping every prediction also keeps the analysis
+  simpler, since nothing has to be reconstructed.
 
 ## D-023: Pilot line is the Victoria line
 - **Date:** 2026-11-06 · **Status:** DECIDED · **Decided by:** me
@@ -330,3 +343,34 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   Northern line's branches, trains on the District line changing destination, shared track on the
   Circle and Hammersmith & City lines) are not tested by the pilot, so they are checked when the main
   collection starts.
+
+## D-024: `request_id` comes from SQLite, not a counter in the program
+- **Date:** 2026-11-12 · **Status:** DECIDED · **Decided by:** me
+- **Context:** My first version counted requests in `Main`. That counter starts again at 1 every time
+  the logger restarts, so after a restart its IDs would clash with rows already in `tflrequests`.
+- **Decision:** SQLite assigns `request_id` (`INTEGER PRIMARY KEY`), and `insertRequest` returns it with
+  `INSERT ... RETURNING request_id`. The request row is inserted first, and the raw file line is written
+  with that ID.
+- **Alternatives considered:** Keeping my counter and setting it from `SELECT MAX(request_id)` at start-up.
+- **Reasoning:** **[AI-expanded]** One source of truth that survives restarts, with no extra code. Tested
+  on 2026-11-13: IDs carried on after a restart, and matched the raw file.
+
+## D-025: Every request is recorded, and any 2xx status counts as success
+- **Date:** 2026-11-13 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** A response with a 2xx status and a usable body (an array with no line breaks) is
+  saved. Everything else still gets a `tflrequests` row, through one method (`recordFailure`), with
+  the error: `HTTP <status>`, `Bad body`, or the exception type (for example `HttpTimeoutException`).
+  Failures never stop the logger. After more than 10 failures in a row it logs a warning, and it logs
+  when it recovers.
+- **Reasoning:** **[AI-expanded]** Gaps must show up in the data, not as silent holes (R-03), so the
+  analysis can tell "no trains" from "logger could not see them".
+
+## D-026: Repeated and stale responses are kept and handled in the analysis
+- **Date:** 2026-11-19 · **Status:** DECIDED · **Decided by:** me
+- **Context:** In a 10-minute test on 2026-11-10, 7 of 21 responses repeated an earlier TfL timestamp,
+  once a later request returned older data, and TfL's data was about 49 seconds old when it arrived.
+- **Decision:** The logger saves every response as it arrives, including repeats. The analysis orders
+  observations by TfL's timestamp (`tfl_newest_timestamp`), not by `sent_at`, and drops exact repeats.
+- **Consequences:** **[AI-expanded]** Repeats cost some disk space but nothing is lost. The age of the
+  data and TfL's update interval, not my 30-second requests, limit how precisely an arrival can be
+  timed (R-04). The pilot measures both.

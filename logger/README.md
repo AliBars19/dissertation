@@ -1,6 +1,6 @@
 # logger/
 
-The data logger that polls the TfL Unified API thall run on my VPS
+The data logger that polls the TfL Unified API that runs on my VPS
 
 ## Build plan
 Each step ends with a check that must pass before I start the next one.
@@ -39,11 +39,18 @@ Each step ends with a check that must pass before I start the next one.
 12. **Survive failures.** (DONE) One bad response, a timeout or a database error is logged and the logger
     carries on with the next request.
     *Check:* feeding it broken JSON does not stop it.
-13. **Run as a service.** Build with `./gradlew installDist`, copy the result to the VPS, and run it
-    as a systemd service that restarts after a crash or reboot.
-    *Check:* after rebooting the VPS, the logger is running again without me starting it.
-14. **48-hour test run.**
+13. **Run as a service.** (DONE 2026-11-17) Built on the VPS with `./gradlew installDist` and run as
+    the systemd service `tfl-logger.service`, with its settings in `~/tfl-logger.env` (D-019).
+    *Check:* after the VPS rebooted on 2026-11-19, the logger was running again without me starting it,
+    and `systemctl stop` ran the shutdown hook ("Stopped cleanly").
+14. **48-hour test run.** (DONE 2026-11-19)
     *Check:* no unexplained gaps, the clock stays right, and the measured size per day fits the VPS.
+    *Result:* from 2026-11-17 14:45 to 2026-11-19 12:26 UTC (45 h 41 min): 5,474 requests, 13 failed
+    (11 `HttpTimeoutException`, 2 `IOException`), 993,441 predictions saved. One gap of 5.4 minutes
+    while the VPS rebooted; no crashes (`NRestarts=0`). Size: 36 MB of raw files and a 55 MB database,
+    about 47 MB a day for the Victoria line, or about 58 bytes per prediction. Scaled to all 11 lines
+    (about 15 times the records), that is about 700 MB a day and 8 to 12 GB for two weeks, which fits
+    the VPS (D-022).
 
 ### D. Pilot 
 15. **Go/no-go criteria**, written before the pilot starts: how often a train can be followed from
