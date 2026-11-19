@@ -59,7 +59,8 @@ Each step ends with a check that must pass before I start the next one.
 16. **Run the pilot** and write up the results and the go/no-go decision in `docs/pilot/`.
 
 ### E. Main collection
-17. **Two full weeks of all 11 lines**, at the interval the pilot showed.
+17. **Two full weeks of all 11 lines**, 7 to 20 December 2026 (D-020), at the interval the pilot
+    showed, if the pilot passes.
 18. **Stopwatch sample** taken inside those two weeks.
 19. **Back up and publish:** raw data off the VPS, then to a data archive such as Zenodo; the repo
     gets a sample and the derived tables.

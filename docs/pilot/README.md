@@ -1,14 +1,18 @@
-# Pilot: Victoria line, Unified API only, 1 to 2 weeks
+# Pilot: Victoria line, Unified API only, 19 November to 2 December 2026
 
 **Goal:** find out how reliably actual arrivals can be inferred from the Unified API's position text
 (`currentLocation`, D-014) on one line, before committing to a full-network study.
 
-**Dates in my plan:** 7 to 20 December 2026 (Gantt chart, PDD Appendix B).
+**Pilot window:** 2026-11-19 00:00 UTC to 2026-12-02 23:59 UTC, two full weeks (D-027). This replaces
+7 to 20 December in my PDD Gantt chart. Development data, used to build and tune the analysis, is
+the 48-hour run before it (2026-11-17 14:45 to 2026-11-18 23:59 UTC); the pilot data is analysed once,
+when the pilot ends.
 
 ## Checklist
 - [x] Choose the line, with reasons recorded as a decision: Victoria (D-023).
-- [ ] Define what counts as a usable inferred arrival, and the rate that means "go" for the main
-      study. Include how well `vehicleId` tracks one train over time.
+- [x] Define what counts as a usable inferred arrival, and the rate that means "go" for the main
+      study, including how well `vehicleId` tracks one train over time: see "Go/no-go criteria" below
+      (2026-11-19).
 - [x] Design the logger data schema on paper, including gap and outage logging: `logger/schema.sql`
       and D-022.
 - [x] Get a Unified API key; decide where secrets live: registered 2026-11-06 (L-03), kept in a
@@ -18,8 +22,50 @@
 - [x] Write the logger by hand (D-007): built 2026-11-06 to 2026-11-17, running on the VPS
       (`logger/README.md`).
 - [ ] Run the pilot; record start/end dates and logger uptime.
-- [ ] Hand-time a small stopwatch sample on the pilot line (protocol written first).
+- [ ] Hand-time a small stopwatch sample on the pilot line, inside the pilot window (protocol below).
 - [ ] Write up pilot results and the go / no-go decision.
+
+## Go/no-go criteria (decided 2026-11-19, before any pilot data was analysed)
+**Definitions**
+- **A train** is one `lineId` plus `vehicleId` (D-022).
+- **An inferred arrival** of a train at station S is the first observation with `currentLocation`
+  "At S" after an observation of the same train "Approaching S" or "Between X and S". Its time is
+  the midpoint of those two observations' TfL timestamps, and its precision is the time between them.
+  Observations are ordered by TfL timestamp, and exact repeats are dropped (D-026).
+- **An expected stop** is each station a train should pass between two consecutive termini on its
+  route.
+
+| # | Question | Measure | Pass mark |
+|---|---|---|---|
+| 1 | Can a train be followed? | Share of expected stops that have an inferred arrival | at least 80% |
+| 2 | How precise is an inferred arrival? | Median time between the two bracketing observations | 60 s or less |
+| 3 | Do inferred arrivals match reality? | Median absolute difference from the stopwatch sample | 30 s or less, over at least 20 arrivals |
+| 4 | How often does TfL's data change? | Distinct TfL timestamps per hour | measured only; sets the request interval |
+| 5 | Is the logger reliable? | Failed requests; longest gap | under 1%, and no gap over 10 minutes |
+
+**Outcomes**
+- **Go:** criteria 1, 2, 3 and 5 pass. The main collection covers all 11 lines (D-020).
+- **Partial:** if a criterion fails only because of a fixable rule (for example the arrival rule),
+  I change the rule on the development data, say so in the report, and re-run on the pilot once. If
+  the method works on some lines and not others, the main collection and the app cover the lines
+  that work (D-011).
+- **No-go:** if criterion 3 fails, the arrival method is rethought before any main collection.
+
+## Stopwatch protocol (draft)
+I do not need to see the logger's data while timing. I record what I see, and match it afterwards.
+1. **Clock:** a phone clock showing seconds, set to network time (accurate to under a second).
+   Times are written in UTC (in winter, UK time is UTC).
+2. **Where:** a Victoria line platform, for example Oxford Circus or Victoria, noting the station
+   and platform (for example "Southbound - Platform 4").
+3. **What to time:** the moment the train comes to a stop at the platform. Optionally also the moment
+   its doors close.
+4. **Record per train:** date, station, platform, arrival time to the second, and anything unusual
+   (held at the platform, announcement, crowding).
+5. **How many:** at least 20 arrivals, on at least two different days and times inside the pilot
+   window.
+6. **Matching:** each timed arrival is matched to the inferred arrival at the same station and
+   platform closest in time (Victoria trains are at least about 100 seconds apart, so the match is
+   unambiguous). Unmatched timings are reported, not dropped.
 
 ## Settled so far
 - **Where it runs:** my OVHcloud VPS (D-019).

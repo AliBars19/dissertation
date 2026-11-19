@@ -274,6 +274,9 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   no inferred arrivals to check it against. The two weeks should avoid the Christmas period. This
   replaces the continuous collection from 21 December to 7 March in my PDD Gantt chart; I tell my
   consultant at the next meeting.
+- **Update 2026-11-19:** The two weeks are 2026-12-07 00:00 to 2026-12-20 23:59 UTC, all 11 Tube lines,
+  if the pilot's go/no-go passes (D-027). Switching to all lines is one change to `LOGGER_LINES` in
+  `~/tfl-logger.env` and a restart. The stopwatch sample for this dataset is taken inside these two weeks.
 
 ## D-021: Logged trains are replayed through an API on my VPS
 - **Date:** 2026-11-06 · **Status:** DECIDED · **Decided by:** me
@@ -374,3 +377,31 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Consequences:** **[AI-expanded]** Repeats cost some disk space but nothing is lost. The age of the
   data and TfL's update interval, not my 30-second requests, limit how precisely an arrival can be
   timed (R-04). The pilot measures both.
+
+## D-027: Pilot from 19 November to 2 December, analysed once at the end
+- **Date:** 2026-11-19 · **Status:** DECIDED · **Decided by:** me
+- **Context:** The logger was finished and running on the VPS by 2026-11-17, ahead of the pilot planned
+  for 7 to 20 December.
+- **Decision:** The Victoria line pilot runs from 2026-11-19 00:00 to 2026-12-02 23:59 UTC. Its go/no-go
+  criteria are fixed today in `docs/pilot/README.md`. I build the analysis pipeline on the 48-hour run
+  before the pilot (development data), then run it once on the pilot data when the pilot ends. The
+  stopwatch sample is taken inside the pilot window. The iOS app is built after the go/no-go, with the
+  scope the results support.
+- **Reasoning:** **[AI-expanded]** Fixing the criteria before looking at the pilot data, and tuning only on
+  separate data, stops me moving the goalposts. Starting about 2.5 weeks early leaves slack before
+  Christmas and lets the main collection start in early January.
+- **Consequences:** **[AI-expanded]** This changes the dates in my PDD Gantt chart; I tell my consultant at
+  the next meeting. The app now comes after the pilot and the main collection planning, so it must still
+  reach testers in time for the survey, after full ethics approval (final ethics materials due 21 February
+  2027).
+
+## D-028: The analysis is written in Python
+- **Date:** 2026-11-19 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** The analysis pipeline (following trains, inferring arrivals, prediction errors,
+  stability, the lookup-table correction and the report's charts) is written by me, by hand, in Python
+  with pandas and matplotlib, reading `logger.db` directly (D-007).
+- **Alternatives considered:** Java, the same language as the logger; plain SQL queries.
+- **Reasoning:** **[AI-expanded]** pandas reads SQLite directly and suits exploring time-ordered data, and
+  matplotlib produces the report's figures. Each library gets a licence row with its version when I
+  install it.
+
