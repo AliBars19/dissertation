@@ -3,3 +3,5 @@ UNI-Docs/
 .env
 /data/raw
 /data/logger.db
+.venv/
+data/vps-2026-11-19.db
