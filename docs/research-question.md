@@ -24,11 +24,16 @@ Wording drafted with Claude Code from my ideas, and I chose it from options (see
   later held-out data, compared with TfL's original predictions?
 - SQ4: How do London commuters who try the app rate its usefulness, and how far do they trust
   corrected times shown alongside TfL's?
+- SQ5: How much more accurate are TfL's live predictions, and my correction, than the published
+  timetable, at the same moments? (Added 2026-11-20, D-029.)
 
 ### Change since first writing v1
 SQ1 originally named TrackerNet as the position source. Changed the same day after I dropped it (D-014).
 
 SQ1 also named Darwin as a second check. Removed on 2026-11-05 (D-016).
+
+SQ5 added on 2026-11-20, after the PDD, to compare against the published timetable (D-029). It is
+numbered last so that SQ1 to SQ4 keep the numbers they have in the PDD.
 
 ### Hypothesis
 - H1 (for SQ3): The correction reduces mean absolute error on held-out data, compared with TfL's

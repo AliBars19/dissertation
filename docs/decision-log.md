@@ -405,3 +405,29 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   matplotlib produces the report's figures. Each library gets a licence row with its version when I
   install it.
 
+## D-029: The published timetable is a third baseline, saved daily from the main collection
+- **Date:** 2026-11-20 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** The main study compares four times for each station and moment: the published
+  timetable, TfL's live prediction, my lookup-table correction, and the inferred actual arrival. Each
+  estimate answers the same question at the same moment: when is the next train due at this station?
+  The timetable is fetched from the Unified API (`/Line/{id}/Timetable/{stopId}`, both ends of each
+  line) once a day by a small script of my own, separate from the logger, from 2026-12-07 for all 11
+  lines. No timetables are saved for the pilot.
+- **Last trains and closures:** the timetable labels observations; it never removes them. Each station
+  gets its own timetabled last time (the last departure from the terminus plus the minutes to that
+  station), so the line quietens down station by station until it is fully shut. Observations after
+  that time are labelled "after timetable" and reported separately. A run of empty responses outside
+  timetabled hours is a scheduled closure; one inside timetabled hours is flagged and looked into.
+- **Alternatives considered:** a line-wide cut-off at the last departure, treating anything later as no
+  trains; finding closures from the timetable instead of the data; starting the daily snapshots during
+  the pilot.
+- **Reasoning:** **[AI-expanded]** Without a timetable baseline a reader cannot tell how much TfL's live
+  predictions add over the published plan. A line-wide cut-off would delete real trains: on
+  2026-11-18 the last departure from Brixton was 00:28, but the trip to Walthamstow Central takes 31
+  minutes, and a train was still being predicted from 00:38 to 00:43. A timetable only shows what was
+  planned, so engineering works, strikes and late running are found from the data. A separate script
+  keeps the logger unchanged. The timetable is to the minute and trains run every 90 seconds at peak,
+  so its error is reported by time of day.
+- **Effect on the research question:** adds SQ5 (`docs/research-question.md`); H1 is unchanged. This is
+  a change since the PDD, so I tell my consultant.
+- **Licence:** TfL Unified API data, already covered by L-01.

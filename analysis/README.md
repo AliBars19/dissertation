@@ -55,9 +55,16 @@ Each step ends with a check that must pass before I start the next one.
    line (TfL returns `[]`) is not a failure and not a gap: it means that line was closed. Closed
    periods are found from the data, not from a timetable, because Night Tube nights and engineering
    works differ from the normal hours. For the main collection, one request covers all 11 lines, so a
-   closure is found per line from the predictions, not from `record_count`.
-   *Check:* the same numbers as an SQL query; the development window shows one closure, 2026-11-18
-   00:34 to 05:12 UTC (546 empty responses).
+   closure is found per line from the predictions, not from `record_count`. In the main collection,
+   each empty run is labelled against that day's timetable: outside timetabled hours is a scheduled
+   closure, inside is flagged and looked into (D-029). No timetables are saved for the pilot, so its
+   empty runs are listed without labels.
+   *Check:* the same numbers as an SQL query. The development window has two runs of empty
+   responses on 2026-11-18: 7 from 00:34:37 to 00:37:37 and 539 from 00:43:37 to 05:12:37 UTC.
+   *Progress:* 4.1 (failure rate) and 4.2 (longest gap) done 2026-11-20: 8 of 3,990 requests failed
+   (0.20%; 6 `HttpTimeoutException`, 2 `IOException`); the longest gap between successful requests
+   is 60.001 s, ending at 2026-11-18 17:23:07 UTC. All 8 gaps of about 60 s are single failed
+   requests. Criterion 5 passes on the development data.
 5. **TfL update rate (criterion 4) and repeats (D-026).** Distinct TfL timestamps per hour, counted
    only while the line is open; responses that repeat or go back to an older TfL timestamp are
    dropped.
@@ -84,4 +91,8 @@ Each step ends with a check that must pass before I start the next one.
 
 ### D. Main study (after the main collection)
 Prediction error against inferred arrivals, prediction stability, and the lookup-table correction
-(H1: week 1 builds the table, week 2 tests it). Planned in detail once the pilot is decided.
+(H1: week 1 builds the table, week 2 tests it). The published timetable is a third baseline (SQ5,
+D-029): at each moment, the timetable's next train, TfL's prediction and my correction are each
+compared with the inferred arrival, and the timetable's error is reported by time of day. Each
+station gets its own timetabled last time; observations after it are labelled "after timetable" and
+reported separately, not removed. Planned in detail once the pilot is decided.

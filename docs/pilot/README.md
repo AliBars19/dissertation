@@ -96,10 +96,10 @@ I do not need to see the logger's data while timing. I record what I see, and ma
   5.4-minute gap during a VPS reboot, 993,441 predictions. About 47 MB a day in total, about 58
   bytes per stored prediction; storing every prediction fits for the main collection (D-022).
 - **Overnight closure:** on the night of 17 to 18 November (a weeknight, so no Night Tube), TfL
-  returned an empty list (`[]`, 2 bytes, HTTP 200) for 546 requests in a row, from 00:34:37 to
-  05:12:37 UTC (4 h 33 min). The last train was seen at 00:34:07 and the first of the morning at
-  05:13:07. The Victoria line runs all night on Friday and Saturday nights, so the pilot should show
-  this on weeknights only.
+  returned an empty list (`[]`, 2 bytes, HTTP 200) for 546 requests in two runs: 7 from 00:34:37 to
+  00:37:37 UTC, then, after one late train was seen from 00:38:07 to 00:43:07, 539 from 00:43:37 to
+  05:12:37 UTC (4 h 29 min). The first train of the morning was seen at 05:13:07. The Victoria line
+  runs all night on Friday and Saturday nights, so the pilot should show this on weeknights only.
 - **Missing directions:** in my local test files (Victoria line), 5,089 of the 5,091 predictions with
   no `direction` were for the two terminus stations, Walthamstow Central (2,734) and Brixton (2,355),
   and in all 5,089 the platform and `towards` disagree (for example a Northbound platform with

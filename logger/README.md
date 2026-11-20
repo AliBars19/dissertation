@@ -60,7 +60,9 @@ Each step ends with a check that must pass before I start the next one.
 
 ### E. Main collection
 17. **Two full weeks of all 11 lines**, 7 to 20 December 2026 (D-020), at the interval the pilot
-    showed, if the pilot passes.
+    showed, if the pilot passes. Alongside it, a small separate script saves each line's timetable
+    from both ends once a day (22 requests a day), starting 7 December (D-029). The logger itself
+    is not changed.
 18. **Stopwatch sample** taken inside those two weeks.
 19. **Back up and publish:** raw data off the VPS, then to a data archive such as Zenodo; the repo
     gets a sample and the derived tables.
