@@ -43,6 +43,11 @@ when the pilot ends.
 | 4 | How often does TfL's data change? | Distinct TfL timestamps per hour | measured only; sets the request interval |
 | 5 | Is the logger reliable? | Failed requests; longest gap | under 1%, and no gap over 10 minutes |
 
+**Clarification (2026-11-20, from the development data, before any pilot data was analysed):** a
+successful request that returns no predictions (`[]`) means the line was closed. It is not a failed
+request and not a gap under criterion 5, and closed periods are left out of criterion 4. Closed
+periods are found from the data, not from a timetable.
+
 **Outcomes**
 - **Go:** criteria 1, 2, 3 and 5 pass. The main collection covers all 11 lines (D-020).
 - **Partial:** if a criterion fails only because of a fixable rule (for example the arrival rule),
@@ -90,6 +95,11 @@ I do not need to see the logger's data while timing. I record what I see, and ma
 - **48-hour run (2026-11-17 to 2026-11-19, Victoria line):** 5,474 requests, 13 failed (0.24%), one
   5.4-minute gap during a VPS reboot, 993,441 predictions. About 47 MB a day in total, about 58
   bytes per stored prediction; storing every prediction fits for the main collection (D-022).
+- **Overnight closure:** on the night of 17 to 18 November (a weeknight, so no Night Tube), TfL
+  returned an empty list (`[]`, 2 bytes, HTTP 200) for 546 requests in a row, from 00:34:37 to
+  05:12:37 UTC (4 h 33 min). The last train was seen at 00:34:07 and the first of the morning at
+  05:13:07. The Victoria line runs all night on Friday and Saturday nights, so the pilot should show
+  this on weeknights only.
 - **Missing directions:** in my local test files (Victoria line), 5,089 of the 5,091 predictions with
   no `direction` were for the two terminus stations, Walthamstow Central (2,734) and Brixton (2,355),
   and in all 5,089 the platform and `towards` disagree (for example a Northbound platform with

@@ -1,6 +1,6 @@
 # analysis/
 
-The analysis pipeline, written by me in Python with pandas and matplotlib (D-028). It reads the
+The analysis pipeline written in Python with pandas and matplotlib (D-028). It reads the
 logger's SQLite database, follows each train through its `currentLocation` text, infers when it
 arrived at each station, and produces the numbers and charts for the pilot's go/no-go decision
 (`docs/pilot/README.md`) and, later, the main study.
@@ -39,15 +39,28 @@ Each step ends with a check that must pass before I start the next one.
    2026-11-19 15:02 UTC and 1,062,459 predictions. Inside the development window: 3,990 requests.
 
 ### B. Build (development data only)
-3. **Load.** The predictions, joined to their lookup tables, in one DataFrame, and the requests in a
+3. **Load.** (FINISHED) The predictions, joined to their lookup tables, in one DataFrame, and the requests in a
    second, both cut to the window, with times turned into UTC datetimes.
    *Check:* the number of prediction rows equals `SUM(record_count)` from an SQL query over the same
    window.
-4. **Logger health (criterion 5).** Failed requests as a share of all requests, and the longest gap
-   between successful requests.
-   *Check:* the same numbers as an SQL query.
-5. **TfL update rate (criterion 4) and repeats (D-026).** Distinct TfL timestamps per hour; responses
-   that repeat or go back to an older TfL timestamp are dropped.
+   *Result:* (DONE 2026-11-20) 3,990 requests; `received_at` missing for the 8 failures,
+   `tfl_newest_timestamp` missing for 554 (the 8 failures and 546 empty responses while the line was
+   closed). 787,251 predictions, equal to `SUM(record_count)`; 16 stations; `destination_name`
+   missing for 52 predictions (kept by the `LEFT JOIN`). All times are UTC datetimes cut to the
+   millisecond. For every prediction, `expected_arrival` minus `tfl_newest_timestamp` is within one
+   second of `time_to_station` (TfL cuts `expected_arrival` to whole seconds), which confirms D-022
+   on the whole development window.
+4. **Logger health (criterion 5) and line closures.** Failed requests as a share of all requests,
+   and the longest gap between successful requests. A successful request with no predictions for a
+   line (TfL returns `[]`) is not a failure and not a gap: it means that line was closed. Closed
+   periods are found from the data, not from a timetable, because Night Tube nights and engineering
+   works differ from the normal hours. For the main collection, one request covers all 11 lines, so a
+   closure is found per line from the predictions, not from `record_count`.
+   *Check:* the same numbers as an SQL query; the development window shows one closure, 2026-11-18
+   00:34 to 05:12 UTC (546 empty responses).
+5. **TfL update rate (criterion 4) and repeats (D-026).** Distinct TfL timestamps per hour, counted
+   only while the line is open; responses that repeat or go back to an older TfL timestamp are
+   dropped.
    *Check:* the share of repeated responses is close to the 10-minute test (7 of 21).
 6. **Position text.** Every distinct form of `currentLocation` listed ("At X", "Approaching X",
    "Between X and Y" and any others), then parsed into a state and station(s).
