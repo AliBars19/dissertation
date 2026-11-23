@@ -3,6 +3,7 @@ from load import load_predictions as lp
 
 from health import failure_rate as fr
 from health import longest_gap as lg
+from health import empty_runs as er
 
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
@@ -14,6 +15,7 @@ requests = lr(db_path, start , end)
 predictions = lp(db_path, start, end)
 health = fr(requests)
 longest = lg(requests)
+empty = er(requests)
 
 print(len(requests))
 print(requests.head())
@@ -24,3 +26,5 @@ print(predictions.head())
 print (health)
 
 print(longest)
+
+print(empty)

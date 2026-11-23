@@ -64,7 +64,9 @@ Each step ends with a check that must pass before I start the next one.
    *Progress:* 4.1 (failure rate) and 4.2 (longest gap) done 2026-11-20: 8 of 3,990 requests failed
    (0.20%; 6 `HttpTimeoutException`, 2 `IOException`); the longest gap between successful requests
    is 60.001 s, ending at 2026-11-18 17:23:07 UTC. All 8 gaps of about 60 s are single failed
-   requests. Criterion 5 passes on the development data.
+   requests. Criterion 5 passes on the development data. 4.3 (`empty_runs`) done 2026-11-23: two runs
+   of empty responses, requests 1181 to 1187 (7) and 1199 to 1737 (539), matching the SQL check.
+   Step 4 DONE.
 5. **TfL update rate (criterion 4) and repeats (D-026).** Distinct TfL timestamps per hour, counted
    only while the line is open; responses that repeat or go back to an older TfL timestamp are
    dropped.
