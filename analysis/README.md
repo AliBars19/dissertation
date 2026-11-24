@@ -82,8 +82,7 @@ Each step ends with a check that must pass before I start the next one.
    *Progress:* 6.1 done 2026-11-24: 82 distinct texts in the 480,711 fresh predictions, saved to
    `analysis/output/locations.csv`. 6.3 (`parse_location`, `add_states`) done 2026-11-24: BETWEEN 210,137,
    AT 194,160, ARRIVING 46,324, DEPARTED 26,590, depots and `0` 3,500, unparsed 0. 19 distinct station
-   texts: the 16 stations, two cut off at 50 characters (`Kings Cross St. P`, `Highbury & Isl`) and
-   `PLATFORM`.
+   texts: the 16 stations, two cut off at 50 characters (`Kings Cross St. P`, `Highbury & Isl`) and Step 6 DONE.
 7. **Train trails.** One row per train per TfL timestamp, where a train is `lineId` plus `vehicleId`
    (D-022; `vehicleId` is only unique within a line).
    *Check:* one train's trail over an hour reads as a journey along the line.
