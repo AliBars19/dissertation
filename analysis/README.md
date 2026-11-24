@@ -70,7 +70,7 @@ Each step ends with a check that must pass before I start the next one.
 5. **TfL update rate (criterion 4) and repeats (D-026).** Distinct TfL timestamps per hour, counted
    only while the line is open; responses that repeat or go back to an older TfL timestamp are
    dropped.
-   *Check:* the share of repeated responses is close to the 10-minute test (7 of 21).
+   *Check:* the share of repeated responses is close to the 10-minute test (7 of 21). STEP 5 DONE
 6. **Position text.** Every distinct form of `currentLocation` listed ("At X", "Approaching X",
    "Between X and Y" and any others), then parsed into a state and station(s).
    *Check:* at least 99% of rows parse; the rest are listed.
