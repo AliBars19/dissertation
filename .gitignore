@@ -6,3 +6,4 @@ UNI-Docs/
 .venv/
 data/vps-2026-11-19.db
 /analysis/__pycache__
+/analysis/output/locations.csv

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from load import load_requests as llr
 from load import load_predictions as llp
 
@@ -8,6 +10,8 @@ from health import empty_runs as her
 from freshness import label_freshness as flf
 from freshness import update_interval as fui
 from freshness import fresh_predictions as ffp
+
+from locations import list_locations as lll
 
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
@@ -24,6 +28,11 @@ freshness = flf(requests)
 update = fui(freshness)
 freshpredic = ffp(predictions,freshness)
 
+locations=lll(freshpredic)
+csv=Path(__file__).parent/"output"/"locations.csv"
+locations.to_csv(csv)
+
+'''
 print(len(requests))
 print(requests.head())
 
@@ -41,3 +50,4 @@ print(freshness["label"].value_counts())
 print(update)
 
 print(freshpredic)
+'''
