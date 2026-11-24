@@ -12,6 +12,7 @@ from freshness import update_interval as fui
 from freshness import fresh_predictions as ffp
 
 from locations import list_locations as lll
+from locations import add_states as las
 
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
@@ -27,10 +28,19 @@ empty = her(requests)
 freshness = flf(requests)
 update = fui(freshness)
 freshpredic = ffp(predictions,freshness)
+parsing = las(freshpredic)
 
+
+print (parsing)
+
+
+
+'''
 locations=lll(freshpredic)
 csv=Path(__file__).parent/"output"/"locations.csv"
 locations.to_csv(csv)
+'''
+
 
 '''
 print(len(requests))
