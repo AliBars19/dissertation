@@ -72,8 +72,18 @@ Each step ends with a check that must pass before I start the next one.
    dropped.
    *Check:* the share of repeated responses is close to the 10-minute test (7 of 21). STEP 5 DONE
 6. **Position text.** Every distinct form of `currentLocation` listed ("At X", "Approaching X",
-   "Between X and Y" and any others), then parsed into a state and station(s).
-   *Check:* at least 99% of rows parse; the rest are listed.
+   "Between X and Y" and any others), then parsed into a state (AT, DEPARTED, BETWEEN, ARRIVING) and
+   station (D-030). Depots, sidings and `0` are counted but not parsed. Station text is matched to
+   the `stations` table by a rule (same cleaning on both sides, prefix match for text TfL cut off at
+   50 characters, only stations on the train's own line), with a small exceptions file only for what
+   the rule cannot match.
+   *Check:* at least 99% of the rows that are not depots or `0` get a state and a station; the rest
+   are listed.
+   *Progress:* 6.1 done 2026-11-24: 82 distinct texts in the 480,711 fresh predictions, saved to
+   `analysis/output/locations.csv`. 6.3 (`parse_location`, `add_states`) done 2026-11-24: BETWEEN 210,137,
+   AT 194,160, ARRIVING 46,324, DEPARTED 26,590, depots and `0` 3,500, unparsed 0. 19 distinct station
+   texts: the 16 stations, two cut off at 50 characters (`Kings Cross St. P`, `Highbury & Isl`) and
+   `PLATFORM`.
 7. **Train trails.** One row per train per TfL timestamp, where a train is `lineId` plus `vehicleId`
    (D-022; `vehicleId` is only unique within a line).
    *Check:* one train's trail over an hour reads as a journey along the line.

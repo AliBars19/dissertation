@@ -431,3 +431,33 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Effect on the research question:** adds SQ5 (`docs/research-question.md`); H1 is unchanged. This is
   a change since the PDD, so I tell my consultant.
 - **Licence:** TfL Unified API data, already covered by L-01.
+
+## D-030: Position text becomes one of four states, in the order a train moves
+- **Date:** 2026-11-24 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** Each `currentLocation` text is turned into a state and a station. Between two
+  stations a train goes through four states in order: **AT** the station, **DEPARTED** from it,
+  **BETWEEN** the two, **ARRIVING** at the next, then **AT** the next station.
+
+  | TfL text | State | Station |
+  |---|---|---|
+  | `At X`, `At X Platform N`, `Departing X` | AT | X |
+  | `At Platform` | AT | the station the prediction is for |
+  | `Departed X`, `Left X` | DEPARTED | X |
+  | `Between X and Y` | BETWEEN | Y (X kept as the station before) |
+  | `Approaching X` | ARRIVING | X |
+
+  Depots and sidings (`Brixton Area`, `Victoria Siding`, `At Brixton Sidings` and similar) and the
+  text `0` are not parsed and not used to follow trains. They are counted and reported, not silently
+  dropped.
+- **What the states are not:** the four states are TfL's own labels put in order. They are not
+  measured positions, so DEPARTED, BETWEEN and ARRIVING are not equal thirds of the distance or
+  time between stations.
+- **Alternatives considered:** keeping TfL's seven wordings as they are; `Departing X` as its own
+  state (it means the train is still at the platform, so it counts as AT); parsing depots as a state.
+- **Reasoning:** **[AI-expanded]** An ordered cycle makes following a train and inferring an arrival
+  simple: an arrival at S is the change from BETWEEN or ARRIVING towards S to AT S. Counting
+  `Departing X` as AT stops arrivals being missed when a train is only seen as it is about to leave
+  (5,610 rows in the development data). Depots and `0` say nothing about a train in service (3,500
+  rows, 0.7%).
+- **Still open, decided at step 8:** whether an arrival can also be inferred when AT S is never seen
+  (for example ARRIVING S followed by DEPARTED S), with a wider bracket and a flag.
