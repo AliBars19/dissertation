@@ -110,7 +110,16 @@ Each step ends with a check that must pass before I start the next one.
    Step 8 DONE.
 9. **Criteria 1 and 2.** Share of expected stops with an inferred arrival whose bracket is 90 s or
    less (D-033), and the median bracket. Expected stops include the station where each train turns
-   round, termini included, with that arrival bracketed across the reversal (D-034).
+   round, termini included, with that arrival bracketed across the reversal (D-034). Brackets are rounded to
+   whole seconds for both criteria (D-035).
+   *Progress:* `terminus_arrivals` and `criteria_1_and_2` written 2026-11-26: 19,981 arrivals inside
+   trips plus 1,222 turn-round arrivals gives 21,203 expected stops (4 false turn-rounds from trips
+   with no direction were found and removed). Hand count, train 210's trip from Walthamstow Central at
+   20:15 to Brixton at 20:46 on 2026-11-17: 15 expected stops, brackets from 28.6 to 90.3 s, all 15
+   within 90 s in whole seconds (12 with exact times). Exact times give criterion 1 85.3% and criterion
+   2 60.011 s; whole seconds give 95.0% and 60 s.
+   Step 9 DONE (2026-11-26): `criteria_1_and_2` gives 21,203 expected stops, criterion 1 95.0%
+   (pass), criterion 2 60 s (pass), on the development data.
    *Check:* a hand count for one trip matches.
 10. **Results table and charts**, written to `analysis/output/`.
     *Check:* running it twice gives identical numbers.

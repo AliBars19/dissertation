@@ -555,11 +555,32 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   its next trip, so the arrival shows up as the start of the next trip, not as part of this one (only
   14 and 5 terminus arrivals were found within trips). Linking each trip to the next recovers 1,222
   turning-station arrivals in the development data (Walthamstow Central and Brixton almost all of
-  them), with a median bracket of 84.8 s; 785 are 90 s or less. Including them, criterion 1 is 85.3%
-  (21,184 expected stops) and criterion 2 is 60.010 s. Leaving the termini out would hide early
+  them), with a median bracket of 84.8 s; 785 are 90 s or less. Including them (and the 19 terminus arrivals
+  found inside trips, none counted twice), criterion 1 is 85.3% (21,203 expected stops) and criterion
+  2 is 60.011 s. Leaving the termini out would hide early
   turn-rounds and part of each trip.
 - **Criterion 2 note:** on the development data the median bracket is 60.002 s without the termini
-  and 60.010 s with them, just over the 60 s pass mark, because the median falls on two TfL updates
+  and 60.011 s with them, just over the 60 s pass mark, because the median falls on two TfL updates
   about 60 s apart. The pass mark is not changed. If the pilot lands just over too, the outcome is
   "Partial", with 10-second polling for the main collection (D-032) as the fix already evidenced
   (median bracket 40.3 s in the 2026-11-26 test hour).
+
+## D-035: Arrival brackets are measured in whole seconds for the criteria
+- **Date:** 2026-11-26 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** When criteria 1 and 2 are worked out, each arrival bracket is rounded to the nearest
+  whole second. The pass marks (bracket of 90 s or less for at least 80% of expected stops; median
+  bracket of 60 s or less) do not change.
+- **Alternatives considered:** keeping exact times to the millisecond; moving the limits between the
+  clusters described below.
+- **How it was noticed:** the step 9 hand count of one trip (train 210, Walthamstow Central to
+  Brixton, 2026-11-17 20:15 to 20:46, 15 expected stops) had three brackets of 90.029, 90.057 and
+  90.337 s that failed the 90 s limit by fractions of a second.
+- **Reasoning:** **[AI-expanded]** A bracket is always about one, two, three or four TfL updates wide,
+  so brackets cluster around 30, 60, 90 and 120 s, each spread by a few hundred milliseconds of jitter
+  in TfL's timestamps (development data, to the nearest second: 5,841 brackets from 29 to 31 s, 7,434
+  from 59 to 61 s, 5,348 from 89 to 91 s, 120 at 120 s). Both pass marks fall in the middle of a
+  cluster, so with exact times the result flips on milliseconds of clock noise: 2,303 brackets lie
+  between 90.0 and 91.0 s, and the median is 60.011 s. TfL's own predictions (`expectedArrival`) are
+  in whole seconds, so whole seconds is the precision of the thing being judged. On the development
+  data: criterion 1 is 95.0% (85.3% with exact times) and criterion 2 is 60 s (60.011 s), so both pass.
+  Decided on the development data before any pilot data was analysed.

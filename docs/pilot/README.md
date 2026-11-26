@@ -65,6 +65,13 @@ periods are found from the data, not from a timetable.
   arrival to within a minute and a half, which at 30-second polling is at most two missed updates in
   a row. 30 seconds was considered and rejected: at 30-second polling only 16% of brackets are that
   narrow, because a bracket cannot be shorter than the time between two updates of one train.
+- **Brackets in whole seconds (D-035):** for criteria 1 and 2 each bracket is rounded to the nearest
+  second. Brackets cluster around 30, 60, 90 and 120 s (one to four TfL updates) with a few hundred
+  milliseconds of jitter, and both pass marks sit in the middle of a cluster, so exact times would make
+  the result depend on clock noise (2,303 development-data brackets lie between 90.0 and 91.0 s, and
+  the median is 60.011 s). TfL's predictions are in whole seconds. Noticed in the step 9 hand count,
+  where one trip had brackets of 90.029, 90.057 and 90.337 s. The pass marks are unchanged.
+- **Expected stops include the station where each train turns round, termini included (D-034).**
 - **Not changed:** criteria 2 to 5 and their pass marks. The main study (10-second polling, D-032)
   sets its own, likely tighter, bracket limit for which arrivals to use, worked out on that data.
 

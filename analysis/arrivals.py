@@ -47,7 +47,7 @@ def terminus_arrivals(clean_trials):
 
       gap = (trips["next_start"] - trips["end"]).dt.total_seconds()#calc the gap between the last time it moveed and now
 
-      turns = trips[(trips["next_direction"] != trips["direction"]) & (gap <= 600) & (trips["next_first_state"] == "AT")]#wait to 10 mins like before and call the first state AT
+      turns = trips[(trips["next_direction"] != trips["direction"]) & trips["direction"].notna() & (gap <= 600) & (trips["next_first_state"] == "AT")]#wait to 10 mins like before and call the first state AT
 
       return pandas.DataFrame({
             "trip": turns["trip"],

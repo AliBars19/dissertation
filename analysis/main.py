@@ -22,6 +22,8 @@ from trails import drop_backwards as tdb
 from arrivals import infer_arrivals as aia
 from arrivals import terminus_arrivals as ata
 
+from criteria import criteria_1_and_2 as cc1a2
+
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
 
@@ -43,13 +45,18 @@ clean_trials,dropped = tdb(trails)
 arrivals = aia(clean_trials)
 terminus = ata(clean_trials)
 
+critera = cc1a2(arrivals,terminus)
+
+print(critera)
+
+
+
+
+
 print(len(terminus))
-
-
-
-
-
 '''
+
+
 print(len(arrivals))
 print(arrivals["seen_at"].sum())
 print(arrivals["bracket_s"].median())
