@@ -86,6 +86,10 @@ Each step ends with a check that must pass before I start the next one.
 7. **Train trails.** One row per train per TfL timestamp, where a train is `lineId` plus `vehicleId`
    (D-022; `vehicleId` is only unique within a line).
    *Check:* one train's trail over an hour reads as a journey along the line.
+   *Progress:* 7.1 (`build_trails`, one position per train per update by majority vote, D-031) and
+   7.2 (direction from TfL's `direction` field, voted and carried forward) done 2026-11-26: 57,211
+   train-updates, 5,696 disagreeing (10%), 44 trains; direction `inbound` 29,551, `outbound` 27,655,
+   none 5. The platform name was rejected for direction (wrong at the termini).
 8. **Inferred arrivals**, by the rule in `docs/pilot/README.md`.
    *Check:* 10 inferred arrivals checked by hand against their trails.
 9. **Criteria 1 and 2.** Share of expected stops with an inferred arrival (the Victoria line's 16

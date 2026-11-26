@@ -486,8 +486,15 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   3. Skipped states are allowed (for example AT one station straight to AT the next); they are not
      filled in, and the arrival rule at step 8 brackets them.
 - **Station order and direction:** stations are numbered north to south, or east to west on lines that
-  run that way. For the pilot the direction of travel comes from the platform name ("Northbound",
-  "Southbound"). Branching lines (Northern, District and others) and the Circle line, a loop, need
+  run that way. The direction of travel is TfL's own `direction` field, voted per
+  train-update like the position, ignoring blanks. On the Victoria line `inbound` is always
+  southbound and `outbound` always northbound (178,850 and 148,604 predictions, none contradicting
+  the train's movement). The field is blank on 21% of predictions, almost all at the two termini;
+  2,923 train-updates (5%) have no value at all and take the direction of the train's previous update,
+  which agrees with the train's movement in 99.7% of the cases that can be checked, leaving 5 with
+  none. The platform name was rejected: at the termini it names the platform a train will leave
+  from, so 19% of predictions gave the opposite direction to their own train. Which of `inbound` and
+  `outbound` runs along the station order is checked for each line before the main collection. Branching lines (Northern, District and others) and the Circle line, a loop, need
   their own treatment before the main collection.
 - **Evidence for the tie rule:** **[AI-expanded]** across the 441 ties, taking the position that
   changed since the train's previous update matched its next position 50% of the time, against 27%
