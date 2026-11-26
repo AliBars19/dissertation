@@ -479,10 +479,17 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Ties and consistency (decided 2026-11-26):** every position gets a progress score, how far along
   its journey the train is: the station's place in the line's order in the direction of travel, times
   four, plus the state's rank (BETWEEN towards it 1, ARRIVING 2, AT 3, DEPARTED 4). Three rules:
-  1. In a tie (441 train-updates, 0.8%), the position with the higher progress wins.
-  2. Within a trip (one run in one direction, restarting when the train reverses at a terminus),
-     progress cannot go down. An update further back than the one before it is treated as a leftover,
-     dropped and counted (roughly 4.7% in a first estimate, some of it likely terminus confusion).
+  1. Ties (441 train-updates, 0.8%) are left to the plain vote for now. Settling them by the higher
+     progress changes only 231 train-updates (0.4%), almost all between neighbouring states such as
+     DEPARTED and BETWEEN for the same pair of stations, so it is revisited after the main collection
+     and added only if the all-lines data shows it matters (decided 2026-11-26).
+  2. Within a trip, progress cannot go down. A trip ends when the train's direction changes or when
+     it has not been seen for more than 10 minutes (the same limit as pilot criterion 5; a full
+     Victoria line trip takes about 32 minutes). An update further back than the best progress so far
+     in its trip is treated as a leftover, dropped and counted. In the development data this gives
+     1,483 trips and 199 dropped updates (0.35%), mostly one state or one station back. Without the
+     10-minute rule, the 122 trains that left service and came back in the same direction would look
+     like 4,375 backwards updates (7.65%) (decided 2026-11-26).
   3. Skipped states are allowed (for example AT one station straight to AT the next); they are not
      filled in, and the arrival rule at step 8 brackets them.
 - **Station order and direction:** stations are numbered north to south, or east to west on lines that

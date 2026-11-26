@@ -16,6 +16,7 @@ from locations import add_states as las
 from locations import add_station_ids as lasi
 
 from trails import build_trails as tbt
+from trails import drop_backwards as tdb
 
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
@@ -35,11 +36,11 @@ parsing = las(freshpredic)
 located = lasi(parsing)
 trails = tbt(located)
 
-print(len(trails))
-print(trails["disagreed"].sum())
-print(trails["vehicle_id"].nunique())
+dropped = tdb(trails)
 
-#print(located)
+print (dropped)
+print(len(dropped))
+print(dropped["trip"].nunique())
 
 '''
 locations=lll(freshpredic)

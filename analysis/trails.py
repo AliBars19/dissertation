@@ -86,6 +86,7 @@ def build_trails(located):
     return trails
 
 def progress (direction,station,state):#calculate how far along the train is on the line
+
     if direction == "inbound":#southbount
         order = VICTORIA_NORTH_TO_SOUTH
     elif direction == "outbound":#nprthbound
@@ -98,3 +99,19 @@ def progress (direction,station,state):#calculate how far along the train is on 
     progress = 4 * place + STATE_RANKING[state]
 
     return progress
+
+def drop_backwards(trails):
+    train = ["line_id","vehicle_id"]
+
+    changed = trails["direction"] != trails.groupby(train)["direction"].shift()
+
+    gap = trails.groupby(train)["tfl_time"].diff().dt.total_seconds()
+
+    new_trip = changed | (gap > 600)#over 10 minutes
+
+    trails["trip"] = new_trip.cumsum()
+
+    best_before = trails.groupby("trip")["progress"].cummax().groupby(trails["trip"]).shift()
+
+    backwards = trails["progress"] < best_before
+    return trails[~backwards], backwards.sum()

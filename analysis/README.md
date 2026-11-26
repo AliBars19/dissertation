@@ -90,6 +90,11 @@ Each step ends with a check that must pass before I start the next one.
    7.2 (direction from TfL's `direction` field, voted and carried forward) done 2026-11-26: 57,211
    train-updates, 5,696 disagreeing (10%), 44 trains; direction `inbound` 29,551, `outbound` 27,655,
    none 5. The platform name was rejected for direction (wrong at the termini).
+   7.3 (`progress`, D-031) and 7.5 (`drop_backwards`) done 2026-11-26: progress runs from 1 to 63; a
+   trip ends when the direction changes or the train is unseen for more than 10 minutes, giving 1,483
+   trips; 199 updates (0.35%) went backwards and were dropped, leaving 57,012. Train 210's trail from
+   20:28 to 20:46 on 2026-11-17 keeps all 20 updates and its progress never goes down. Ties (7.4) are
+   left to the plain vote until after the main collection (D-031). Step 7 DONE.
 8. **Inferred arrivals**, by the rule in `docs/pilot/README.md`.
    *Check:* 10 inferred arrivals checked by hand against their trails.
 9. **Criteria 1 and 2.** Share of expected stops with an inferred arrival (the Victoria line's 16
