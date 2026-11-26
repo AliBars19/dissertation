@@ -37,7 +37,7 @@ when the pilot ends.
 
 | # | Question | Measure | Pass mark |
 |---|---|---|---|
-| 1 | Can a train be followed? | Share of expected stops that have an inferred arrival | at least 80% |
+| 1 | Can a train be followed? | Share of expected stops that have an inferred arrival with a bracket of 90 s or less (revised 2026-11-26, see below) | at least 80% |
 | 2 | How precise is an inferred arrival? | Median time between the two bracketing observations | 60 s or less |
 | 3 | Do inferred arrivals match reality? | Median absolute difference from the stopwatch sample | 30 s or less, over at least 20 arrivals |
 | 4 | How often does TfL's data change? | Distinct TfL timestamps per hour | measured only; sets the request interval |
@@ -47,6 +47,26 @@ when the pilot ends.
 successful request that returns no predictions (`[]`) means the line was closed. It is not a failed
 request and not a gap under criterion 5, and closed periods are left out of criterion 4. Closed
 periods are found from the data, not from a timetable.
+
+**Revision (2026-11-26, from the development data, before any pilot data was analysed, D-033):**
+- **An inferred arrival** at station S is now found from the train's progress score (D-031): the
+  first update in a trip whose progress reaches S's AT value. The bracket is that update and the one
+  before it, and the arrival time is their midpoint. This includes stops where no update ever said
+  "At S" because the train arrived and left between two updates ("missed-AT arrivals"); each arrival
+  is flagged `seen_at` so both kinds can be reported. The original wording counted only arrivals where
+  "At S" was seen.
+- **Criterion 1** now asks for an inferred arrival with a bracket of 90 s or less, at least 80% of
+  expected stops.
+- **Why:** on the development data (30-second polling) about 1 in 4 arrivals at every station are
+  missed-AT arrivals (from 17% at Victoria to 56% at Finsbury Park), and their brackets are as narrow
+  as the others (median 60.7 s against 59.9 s). Under the original wording criterion 1 was 72.3% and
+  would fail on data that is fine. Under the new wording it is 86.6%. Counting every arrival would
+  make the measure 100% by construction, so the 90-second limit keeps it a real test: knowing each
+  arrival to within a minute and a half, which at 30-second polling is at most two missed updates in
+  a row. 30 seconds was considered and rejected: at 30-second polling only 16% of brackets are that
+  narrow, because a bracket cannot be shorter than the time between two updates of one train.
+- **Not changed:** criteria 2 to 5 and their pass marks. The main study (10-second polling, D-032)
+  sets its own, likely tighter, bracket limit for which arrivals to use, worked out on that data.
 
 **Outcomes**
 - **Go:** criteria 1, 2, 3 and 5 pass. The main collection covers all 11 lines (D-020).
@@ -100,6 +120,20 @@ I do not need to see the logger's data while timing. I record what I see, and ma
   00:37:37 UTC, then, after one late train was seen from 00:38:07 to 00:43:07, 539 from 00:43:37 to
   05:12:37 UTC (4 h 29 min). The first train of the morning was seen at 05:13:07. The Victoria line
   runs all night on Friday and Saturday nights, so the pilot should show this on weeknights only.
+- **Separate 10-second test (2026-11-26, 20:36 to 21:36 UTC, Victoria line):** a one-off run outside
+  the pilot logger, 360 requests every 10 s from my laptop with the secondary key, analysed with the
+  pipeline's own functions and compared with every third request (what 30-second polling sees in the
+  same hour). TfL's data changed as often as every 10 s (gaps between new timestamps of 10 s: 22,
+  20 s: 23, 30 s: 19, 40 s: 10). Out-of-sync responses rose with faster polling: older data was 31% of
+  responses at 10 s against 14% at 30 s.
+
+  | Polling every | Arrivals | AT seen | Median bracket | Brackets of 90 s or less |
+  |---|---|---|---|---|
+  | 10 s | 351 | 82.6% | 40.3 s | 99.7% |
+  | 30 s (same hour) | 344 | 69.8% | 60.2 s | 93.3% |
+
+  One evening hour on one line, so it informs the polling rate for the main collection at go/no-go
+  rather than settling it. Polling every 10 s triples requests, so storage needs planning first.
 - **Missing directions:** in my local test files (Victoria line), 5,089 of the 5,091 predictions with
   no `direction` were for the two terminus stations, Walthamstow Central (2,734) and Brixton (2,355),
   and in all 5,089 the platform and `towards` disagree (for example a Northbound platform with

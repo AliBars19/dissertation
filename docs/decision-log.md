@@ -506,3 +506,38 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
 - **Evidence for the tie rule:** **[AI-expanded]** across the 441 ties, taking the position that
   changed since the train's previous update matched its next position 50% of the time, against 27%
   for an arbitrary pick, which fits the odd one out usually being a leftover from the update before.
+
+## D-032: The main collection polls every 10 seconds
+- **Date:** 2026-11-26 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** From the main collection (2026-12-07), the logger requests TfL every 10 seconds
+  instead of every 30. The pilot keeps running at 30 seconds until 2026-12-02, so its go/no-go
+  criteria are judged on 30-second data. The change to the logger is made during the go/no-go window
+  (2026-12-03 to 12-06).
+- **Alternatives considered:** keeping 30 seconds; 15 seconds.
+- **Reasoning:** **[AI-expanded]** A separate one-hour test on 2026-11-26 (Victoria line, 20:36 to
+  21:36 UTC, `docs/pilot/README.md`) showed TfL's data sometimes changes within 10 seconds. Compared
+  with 30-second polling in the same hour, 10-second polling saw a train AT the station for 82.6% of
+  arrivals instead of 69.8%, and the median arrival bracket fell from 60.2 s to 40.3 s, so every
+  inferred arrival is about ±20 s instead of ±30 s.
+- **Still to settle before 2026-12-07 (storage):** storing every response at 10 seconds would be about
+  24 to 36 GB for two weeks of all 11 lines, against about 19 GB free on the VPS. Storing only the
+  responses with a newer TfL timestamp (about a third of them at 10 seconds) would keep storage close
+  to the current projection, but changes D-022 (store everything). Decided at go/no-go.
+
+## D-033: Arrivals are bracketed by progress, and criterion 1 needs a bracket of 90 s or less
+- **Date:** 2026-11-26 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** An inferred arrival at station S is the first update in a trip whose progress score
+  (D-031) reaches S's AT value; the bracket is that update and the one before it, and the arrival time
+  is the midpoint. Arrivals where no update said "At S" (missed-AT arrivals) count, flagged
+  `seen_at = False`. Pilot criterion 1 becomes the share of expected stops with an inferred arrival
+  whose bracket is 90 s or less, passing at 80%. Recorded as a dated revision in
+  `docs/pilot/README.md`, made before any pilot data was analysed.
+- **Alternatives considered:** keeping the original wording (only arrivals where "At S" was seen);
+  counting every arrival with no bracket limit; a limit of 120 s; a limit of 30 s.
+- **Reasoning:** **[AI-expanded]** On the development data, 19,981 arrivals were found, 14,455 (72.3%)
+  with "At S" seen. Missed-AT arrivals happen at every station, about 1 in 4, and are as precise as
+  the others (median bracket 60.7 s against 59.9 s), so leaving them out would fail criterion 1
+  (72.3% against 80%) on good data. With no limit the measure is 100% by construction. 90 s passes on
+  the development data (86.6%) and in the 30-second version of the 2026-11-26 test hour (93.3%), and
+  means at most two missed updates in a row; 120 s (99.5%) was judged too loose, and 30 s (16.4%)
+  cannot be met at 30-second polling. The main study sets its own bracket limit on the 10-second data.

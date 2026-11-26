@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 from load import load_requests as llr
 from load import load_predictions as llp
 
@@ -18,6 +19,8 @@ from locations import add_station_ids as lasi
 from trails import build_trails as tbt
 from trails import drop_backwards as tdb
 
+from arrivals import infer_arrivals as aia
+
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
 
@@ -35,14 +38,20 @@ freshpredic = ffp(predictions,freshness)
 parsing = las(freshpredic)
 located = lasi(parsing)
 trails = tbt(located)
+clean_trials,dropped = tdb(trails)
 
-dropped = tdb(trails)
+arrivals = aia(clean_trials)
 
+print(len(arrivals))
+print(arrivals["seen_at"].sum())
+print(arrivals["bracket_s"].median())
+
+'''
 print (dropped)
 print(len(dropped))
 print(dropped["trip"].nunique())
 
-'''
+
 locations=lll(freshpredic)
 csv=Path(__file__).parent/"output"/"locations.csv"
 locations.to_csv(csv)

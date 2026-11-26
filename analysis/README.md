@@ -95,10 +95,17 @@ Each step ends with a check that must pass before I start the next one.
    trips; 199 updates (0.35%) went backwards and were dropped, leaving 57,012. Train 210's trail from
    20:28 to 20:46 on 2026-11-17 keeps all 20 updates and its progress never goes down. Ties (7.4) are
    left to the plain vote until after the main collection (D-031). Step 7 DONE.
-8. **Inferred arrivals**, by the rule in `docs/pilot/README.md`.
+8. **Inferred arrivals**, by the rule in `docs/pilot/README.md` (revised 2026-11-26, D-033): the first
+   update in a trip whose progress reaches a station's AT value, bracketed by the update before it,
+   with the midpoint as the arrival time and a `seen_at` flag.
    *Check:* 10 inferred arrivals checked by hand against their trails.
-9. **Criteria 1 and 2.** Share of expected stops with an inferred arrival (the Victoria line's 16
-   stations in order), and the median bracket between the two observations.
+   *Progress:* `infer_arrivals` done 2026-11-26: 19,981 arrivals, 14,455 with "At S" seen (72.3%),
+   median bracket 60.0 s; train 210's Green Park (28 s, seen) and Vauxhall (60 s, missed-AT) arrivals
+   match the worked example. The hand check of 10 arrivals is still to do.
+9. **Criteria 1 and 2.** Share of expected stops with an inferred arrival whose bracket is 90 s or
+   less (D-033), and the median bracket. Still to decide: which stops count as expected, including
+   the two termini (only 5 and 14 arrivals found there in the development data, because a trip ends as
+   the train reaches the terminus).
    *Check:* a hand count for one trip matches.
 10. **Results table and charts**, written to `analysis/output/`.
     *Check:* running it twice gives identical numbers.
