@@ -39,14 +39,18 @@ parsing = las(freshpredic)
 located = lasi(parsing)
 trails = tbt(located)
 clean_trials,dropped = tdb(trails)
-
 arrivals = aia(clean_trials)
 
+
+
+
+
+'''
 print(len(arrivals))
 print(arrivals["seen_at"].sum())
 print(arrivals["bracket_s"].median())
 
-'''
+
 print (dropped)
 print(len(dropped))
 print(dropped["trip"].nunique())
@@ -55,10 +59,7 @@ print(dropped["trip"].nunique())
 locations=lll(freshpredic)
 csv=Path(__file__).parent/"output"/"locations.csv"
 locations.to_csv(csv)
-'''
 
-
-'''
 print(len(requests))
 print(requests.head())
 

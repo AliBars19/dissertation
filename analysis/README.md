@@ -101,7 +101,13 @@ Each step ends with a check that must pass before I start the next one.
    *Check:* 10 inferred arrivals checked by hand against their trails.
    *Progress:* `infer_arrivals` done 2026-11-26: 19,981 arrivals, 14,455 with "At S" seen (72.3%),
    median bracket 60.0 s; train 210's Green Park (28 s, seen) and Vauxhall (60 s, missed-AT) arrivals
-   match the worked example. The hand check of 10 arrivals is still to do.
+   match the worked example. Hand check (10 arrivals drawn with `sample(10, random_state=1)`, checked
+   against their trails on 2026-11-26): the station, the bracket, the midpoint and `seen_at` are right
+   in all 10 (7 seen, 3 missed-AT). One is physically doubtful: train 267 on 2026-11-18 is "At Pimlico"
+   at 19:28:14 and "At Vauxhall" at 19:28:40, 26 s later, although the two stations are about a
+   minute apart, so the "At Pimlico" was probably a late position from TfL and the bracket is too
+   narrow. The stopwatch sample (criterion 3) is what tests whether TfL's positions run late.
+   Step 8 DONE.
 9. **Criteria 1 and 2.** Share of expected stops with an inferred arrival whose bracket is 90 s or
    less (D-033), and the median bracket. Still to decide: which stops count as expected, including
    the two termini (only 5 and 14 arrivals found there in the development data, because a trip ends as
