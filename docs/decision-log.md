@@ -461,3 +461,34 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   rows, 0.7%).
 - **Still open, decided at step 8:** whether an arrival can also be inferred when AT S is never seen
   (for example ARRIVING S followed by DEPARTED S), with a wider bracket and a flag.
+
+## D-031: One position per train per update, by majority vote
+- **Date:** 2026-11-26 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** A train has one prediction per station ahead of it, and each carries its own
+  position text. For each train (`line_id` plus `vehicle_id`) in each new response, the position
+  (state plus station, D-030) is the one most of its predictions give. Each train-update also gets a
+  `disagreed` flag, true when its predictions gave more than one position, so these can be checked
+  separately later.
+- **Alternatives considered:** the position furthest along the route; the position from the
+  prediction for the nearest station; leaving out train-updates whose predictions disagree.
+- **Reasoning:** **[AI-expanded]** In the development data 5,696 of 57,211 train-updates (10%)
+  disagree, almost always between neighbouring states. In the example checked (train 210 at
+  20:35:46 on 2026-11-17, six predictions "Between Oxford Circus and Green Park" and one "At Oxford
+  Circus"), the single odd one out was left over from the previous update, so the majority was
+  right. Leaving out disagreeing updates would lose 10% of observations.
+- **Ties and consistency (decided 2026-11-26):** every position gets a progress score, how far along
+  its journey the train is: the station's place in the line's order in the direction of travel, times
+  four, plus the state's rank (BETWEEN towards it 1, ARRIVING 2, AT 3, DEPARTED 4). Three rules:
+  1. In a tie (441 train-updates, 0.8%), the position with the higher progress wins.
+  2. Within a trip (one run in one direction, restarting when the train reverses at a terminus),
+     progress cannot go down. An update further back than the one before it is treated as a leftover,
+     dropped and counted (roughly 4.7% in a first estimate, some of it likely terminus confusion).
+  3. Skipped states are allowed (for example AT one station straight to AT the next); they are not
+     filled in, and the arrival rule at step 8 brackets them.
+- **Station order and direction:** stations are numbered north to south, or east to west on lines that
+  run that way. For the pilot the direction of travel comes from the platform name ("Northbound",
+  "Southbound"). Branching lines (Northern, District and others) and the Circle line, a loop, need
+  their own treatment before the main collection.
+- **Evidence for the tie rule:** **[AI-expanded]** across the 441 ties, taking the position that
+  changed since the train's previous update matched its next position 50% of the time, against 27%
+  for an arbitrary pick, which fits the odd one out usually being a leftover from the update before.

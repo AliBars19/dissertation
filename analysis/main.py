@@ -15,6 +15,8 @@ from locations import list_locations as lll
 from locations import add_states as las
 from locations import add_station_ids as lasi
 
+from trails import build_trails as tbt
+
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
 
@@ -31,8 +33,13 @@ update = fui(freshness)
 freshpredic = ffp(predictions,freshness)
 parsing = las(freshpredic)
 located = lasi(parsing)
+trails = tbt(located)
 
-print(located)
+print(len(trails))
+print(trails["disagreed"].sum())
+print(trails["vehicle_id"].nunique())
+
+#print(located)
 
 '''
 locations=lll(freshpredic)
