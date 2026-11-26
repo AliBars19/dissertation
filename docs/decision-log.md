@@ -541,3 +541,25 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   the development data (86.6%) and in the 30-second version of the 2026-11-26 test hour (93.3%), and
   means at most two missed updates in a row; 120 s (99.5%) was judged too loose, and 30 s (16.4%)
   cannot be met at 30-second polling. The main study sets its own bracket limit on the 10-second data.
+
+## D-034: The station where a train turns round is an expected stop, termini included
+- **Date:** 2026-11-26 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** A trip's expected stops are every station between where it was first seen and the
+  station where the train turns round, including that station. Usually that is a terminus, but a
+  train that turns round early (for example at Seven Sisters) has that station as its last expected
+  stop, and the stations beyond it are not expected. The arrival at the turning station is bracketed
+  by the last update of the trip and the first update of the same train's next trip, when that next
+  trip runs the other way, starts within 10 minutes and starts AT a station.
+- **Alternatives considered:** leaving the two termini out of the pilot's expected stops.
+- **Reasoning:** **[AI-expanded]** When a train reaches a terminus, TfL's predictions switch straight to
+  its next trip, so the arrival shows up as the start of the next trip, not as part of this one (only
+  14 and 5 terminus arrivals were found within trips). Linking each trip to the next recovers 1,222
+  turning-station arrivals in the development data (Walthamstow Central and Brixton almost all of
+  them), with a median bracket of 84.8 s; 785 are 90 s or less. Including them, criterion 1 is 85.3%
+  (21,184 expected stops) and criterion 2 is 60.010 s. Leaving the termini out would hide early
+  turn-rounds and part of each trip.
+- **Criterion 2 note:** on the development data the median bracket is 60.002 s without the termini
+  and 60.010 s with them, just over the 60 s pass mark, because the median falls on two TfL updates
+  about 60 s apart. The pass mark is not changed. If the pilot lands just over too, the outcome is
+  "Partial", with 10-second polling for the main collection (D-032) as the fix already evidenced
+  (median bracket 40.3 s in the 2026-11-26 test hour).

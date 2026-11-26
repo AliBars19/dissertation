@@ -20,6 +20,7 @@ from trails import build_trails as tbt
 from trails import drop_backwards as tdb
 
 from arrivals import infer_arrivals as aia
+from arrivals import terminus_arrivals as ata
 
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
@@ -40,6 +41,9 @@ located = lasi(parsing)
 trails = tbt(located)
 clean_trials,dropped = tdb(trails)
 arrivals = aia(clean_trials)
+terminus = ata(clean_trials)
+
+print(len(terminus))
 
 
 

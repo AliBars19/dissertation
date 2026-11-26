@@ -109,9 +109,8 @@ Each step ends with a check that must pass before I start the next one.
    narrow. The stopwatch sample (criterion 3) is what tests whether TfL's positions run late.
    Step 8 DONE.
 9. **Criteria 1 and 2.** Share of expected stops with an inferred arrival whose bracket is 90 s or
-   less (D-033), and the median bracket. Still to decide: which stops count as expected, including
-   the two termini (only 5 and 14 arrivals found there in the development data, because a trip ends as
-   the train reaches the terminus).
+   less (D-033), and the median bracket. Expected stops include the station where each train turns
+   round, termini included, with that arrival bracketed across the reversal (D-034).
    *Check:* a hand count for one trip matches.
 10. **Results table and charts**, written to `analysis/output/`.
     *Check:* running it twice gives identical numbers.

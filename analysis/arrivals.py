@@ -31,3 +31,31 @@ def infer_arrivals(clean_trials):
                         })
                 
     return pandas.DataFrame(found)
+
+def terminus_arrivals(clean_trials):
+      trips = clean_trials.groupby("trip").agg(
+            vehicle_id=("vehicle_id","first"),
+            direction=("direction","first"),
+            start=("tfl_time","first"),
+            end=("tfl_time","last"),
+            first_state=("state","first"),
+            first_station=("station","first")
+      ).reset_index().sort_values(["vehicle_id","start"])
+
+      for col in ["direction","start","first_state","first_station"]:
+            trips["next_"+col] = trips.groupby("vehicle_id")[col].shift(-1)
+
+      gap = (trips["next_start"] - trips["end"]).dt.total_seconds()#calc the gap between the last time it moveed and now
+
+      turns = trips[(trips["next_direction"] != trips["direction"]) & (gap <= 600) & (trips["next_first_state"] == "AT")]#wait to 10 mins like before and call the first state AT
+
+      return pandas.DataFrame({
+            "trip": turns["trip"],
+            "vehicle_id": turns["vehicle_id"],
+            "station": turns["next_first_station"],
+            "before": turns["end"],
+            "after": turns["next_start"],
+            "bracket_s": (turns["next_start"] - turns["end"]).dt.total_seconds(),#this SHOULD be under 90 inshallah
+            "arrival": turns["end"] + (turns["next_start"] - turns["end"])/2,
+            "seen_at": True#make sure its recorded that a trains AT when its at a terminus is recorded as seen at
+      })
