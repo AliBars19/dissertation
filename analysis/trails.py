@@ -42,6 +42,13 @@ VICTORIA_SOUTH_TO_NORTH = [
     "940GZZLUWWL",   # Walthamstow Central
 ]
 
+STATE_RANKING = {
+    "BETWEEN": 1,
+    "ARRIVING": 2,
+    "AT": 3,
+    "DEPARTED": 4
+}
+
 def majority(positions):
     counts = positions.value_counts()
     if len(counts) == 0:
@@ -71,4 +78,23 @@ def build_trails(located):
 
     trails["direction"] = trails.groupby(["line_id","vehicle_id"])["direction"].ffill()
 
+    scores=[]
+    for direction, station, state in zip(trails["direction"],trails["station"],trails["state"]):
+        scores.append(progress(direction,station,state))
+    trails["progress"] = scores
+
     return trails
+
+def progress (direction,station,state):#calculate how far along the train is on the line
+    if direction == "inbound":#southbount
+        order = VICTORIA_NORTH_TO_SOUTH
+    elif direction == "outbound":#nprthbound
+        order = VICTORIA_SOUTH_TO_NORTH
+    else:
+        return None
+
+    place = order.index(station)
+
+    progress = 4 * place + STATE_RANKING[state]
+
+    return progress
