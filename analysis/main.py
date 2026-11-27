@@ -1,5 +1,6 @@
-from pathlib import Path
+import pandas
 
+from pathlib import Path
 
 from processing.load import load_requests as llr
 from processing.load import load_predictions as llp
@@ -24,7 +25,13 @@ from processing.arrivals import terminus_arrivals as ata
 
 from processing.criteria import criteria_1_and_2 as cc1a2
 
+
+
+
+
 from presenting.report import results_table as rrt
+from presenting.charts import bracket_historgram as cbh
+
 
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
@@ -48,11 +55,17 @@ arrivals = aia(clean_trials)
 terminus = ata(clean_trials)
 criteria = cc1a2(arrivals,terminus)
 
+expected = pandas.concat([arrivals,terminus])
+png= (Path(__file__).parent / "output" / "brackets.png")
+cbh(expected,png)
+
+
+
+'''
 results = rrt(health,longest,update,criteria)
 csv = Path(__file__).parent/"output"/"pilot_results.csv"
 results.to_csv(csv)
 
-'''
 print(critera)
 
 
