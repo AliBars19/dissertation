@@ -1,5 +1,5 @@
 import pandas
-from trails import VICTORIA_NORTH_TO_SOUTH, VICTORIA_SOUTH_TO_NORTH
+from analysis.processing.trails import VICTORIA_NORTH_TO_SOUTH, VICTORIA_SOUTH_TO_NORTH
 
 def infer_arrivals(clean_trials):
     found=[]
