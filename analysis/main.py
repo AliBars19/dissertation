@@ -41,6 +41,8 @@ from presenting.charts import bracket_cumulative as cbc
 
 from presenting.charts import missed_at_by_station as cmabs
 
+from presenting.charts import track_single_trip as ctst
+
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
 
@@ -48,40 +50,63 @@ db_path = "/home/alibars/Downloads/UNI/Year 3/dissertation/data/vps-2026-11-19.d
 #hardcoded rn but will change when the time comes
 
 requests = llr(db_path, start , end)
+print ("requests parsed")
 predictions = llp(db_path, start, end)
+print("predictions parsed")
 health = hfr(requests)
+print("health parsed")
 longest = hlg(requests)
+print("longest parsed")
 empty = her(requests)
+print("empty parsed")
 freshness = flf(requests)
+print("freshness parsed")
 update = fui(freshness)
+print("update parsed")
 freshpredic = ffp(predictions,freshness)
+print("freshpredic parsed")
 parsing = las(freshpredic)
+print("parsing parsed")
 located = lasi(parsing)
+print("located parsed")
 trails = tbt(located)
+print("trails parsed")
 clean_trials,dropped = tdb(trails)
+print("clean trials parsed")
 arrivals = aia(clean_trials)
+print("arrivals parsed")
 terminus = ata(clean_trials)
+print("terminus parsed")
 criteria = cc1a2(arrivals,terminus)
+print("criteria parsed")
 
 expected = pandas.concat([arrivals,terminus])
+
+results = rrt(health,longest,update,criteria)
+csv = Path(__file__).parent/"output"/"pilot_results.csv"
+results.to_csv(csv, index=False)
 
 brackets_histogram_png= (Path(__file__).parent / "output" / "brackets_histogram.png")
 brackets_cumulative_png= (Path(__file__).parent / "output" / "brackets_cumulative.png")
 missesd_at_by_station_png= (Path(__file__).parent / "output" / "missed_at_by_station.png")
+track_single_trip_png= (Path(__file__).parent / "output" / "track_single_train.png")
+print("analysis image paths created")
 
 station_names = dict(zip(located["naptan_id"], located["station_name"].str.removesuffix(" Underground Station")))
 
 cbh(expected,brackets_histogram_png)
 cbc(expected,brackets_cumulative_png)
+print("brackets parsed")
+
 cmabs(expected, station_names,missesd_at_by_station_png )
+print("missed AT parsed")
+ctst(clean_trials, expected, 171, station_names, track_single_trip_png)
+print("track single parsed")
+
 
 
 
 '''
-results = rrt(health,longest,update,criteria)
-csv = Path(__file__).parent/"output"/"pilot_results.csv"
-results.to_csv(csv)
-
 print(critera)
 
 

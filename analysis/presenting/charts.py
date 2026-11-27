@@ -3,6 +3,7 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as pyp
 import matplotlib.ticker as pf
+import matplotlib.dates as md
 
 from processing.trails import VICTORIA_NORTH_TO_SOUTH
 
@@ -10,6 +11,7 @@ BLUE = "#0084ff"
 MUTED = "#666666"
 GRID = "#E6E6E6"
 GREY = "#b0b0b0"
+WHITE = "#FFFFFF"
 
 def bracket_historgram(expected, out_path):# this first function is for the clusters of data
     seconds = expected["bracket_s"].round()
@@ -94,6 +96,53 @@ def missed_at_by_station(expected, station_names, out_path):
     axis.xaxis.set_major_formatter(pf.PercentFormatter(1))
     axis.set_title("About 1 in 4 arrivals at each station happen between two updates, \n so the train is never seen AT the platform",loc="left")
     axis.set_xlabel("Share of arrivals never seen AT the station")
+
+    axis.spines[["top","right"]].set_visible(False)
+    axis.grid(axis="x",color=GRID)
+
+    axis.set_axisbelow(True)
+
+    figure.tight_layout()
+    figure.savefig(out_path, dpi=200)
+    pyp.close(figure)
+
+def track_single_trip(clean_trials, expected, trip, station_names,out_path):
+    
+    trail = clean_trials[clean_trials["trip"] == trip]
+    stops = expected[expected["trip"] == trip]
+
+    at_value = {}
+    for i,s in enumerate(VICTORIA_NORTH_TO_SOUTH):
+        at_value[s] = 4*i+3
+        
+
+    y = stops["station"].map(at_value)
+
+    figure,axis = pyp.subplots(figsize=(8,6))
+    
+    axis.step(trail["tfl_time"],trail["progress"], where="post", color=BLUE, linewidth=1)
+
+    axis.hlines(y, stops["before"],stops["after"], color=MUTED, linewidth=3)
+
+    fills = []
+    for seen in stops["seen_at"]:
+        if seen:
+            fills.append(BLUE)
+        else:
+            fills.append(WHITE)
+
+    names = []
+    for s in at_value:
+        names.append(station_names[s])
+
+    axis.scatter(stops["arrival"], y, c=fills, edgecolors=BLUE, zorder=3)#zorder was the craziest discovery lmfao
+
+    axis.set_yticks(list(at_value.values()), names)
+    axis.invert_yaxis()
+    axis.xaxis.set_major_formatter(md.DateFormatter("%H:%M"))
+
+    axis.set_title("Train 210 which started at 8:15pm from \nWalthamstow to Brixton 17th november. \nAll 15 stops were time within 90secs ",loc="left")
+    axis.set_xlabel("Time (UTC)")
 
     axis.spines[["top","right"]].set_visible(False)
     axis.grid(axis="x",color=GRID)

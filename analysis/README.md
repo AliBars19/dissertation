@@ -123,6 +123,13 @@ Each step ends with a check that must pass before I start the next one.
    *Check:* a hand count for one trip matches.
 10. **Results table and charts**, written to `analysis/output/`.
     *Check:* running it twice gives identical numbers.
+    *Progress:* done 2026-11-27. `presenting/report.py` writes `pilot_results.csv` (criteria 1, 2, 4
+    and 5); `presenting/charts.py` draws four charts: the bracket histogram (clusters at 30, 60 and
+    90 s), the cumulative bracket chart (95.0% within 90 s against the 80% pass mark), missed-AT
+    arrivals by station (Finsbury Park 56% highest, Victoria 17% lowest of the middle stations; the
+    termini are near 0% because a turn-round arrival is always seen AT, so they are drawn grey), and
+    train 210's trip 171 (15 stops, 13 seen AT, 2 missed-AT, all within 90 s). Two consecutive runs
+    gave byte-identical files for all four PNGs and the CSV. Step 10 DONE.
 11. **Stopwatch matching (criterion 3).** My timings read from a CSV and matched to inferred arrivals
     at the same station and platform.
     *Check:* every timing is matched or listed as unmatched.
