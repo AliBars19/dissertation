@@ -25,12 +25,9 @@ from processing.arrivals import terminus_arrivals as ata
 
 from processing.criteria import criteria_1_and_2 as cc1a2
 
-
-
-
-
 from presenting.report import results_table as rrt
 from presenting.charts import bracket_historgram as cbh
+from presenting.charts import bracket_cumulative as cbc
 
 
 start = "2026-11-17T14:45:00Z"
@@ -56,8 +53,14 @@ terminus = ata(clean_trials)
 criteria = cc1a2(arrivals,terminus)
 
 expected = pandas.concat([arrivals,terminus])
-png= (Path(__file__).parent / "output" / "brackets.png")
-cbh(expected,png)
+
+brackets_histogram_png= (Path(__file__).parent / "output" / "brackets_histogram.png")
+brackets_cumulative_png= (Path(__file__).parent / "output" / "brackets_cumulative.png")
+
+
+cbh(expected,brackets_histogram_png)
+cbc(expected,brackets_cumulative_png)
+
 
 
 
