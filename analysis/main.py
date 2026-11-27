@@ -2,6 +2,13 @@ import pandas
 
 from pathlib import Path
 
+#constant imports
+
+from processing.trails import VICTORIA_NORTH_TO_SOUTH as VNS
+from processing.trails import VICTORIA_SOUTH_TO_NORTH as VSN
+
+#processing imports
+
 from processing.load import load_requests as llr
 from processing.load import load_predictions as llp
 
@@ -25,10 +32,14 @@ from processing.arrivals import terminus_arrivals as ata
 
 from processing.criteria import criteria_1_and_2 as cc1a2
 
+#presenting imports
+
 from presenting.report import results_table as rrt
+
 from presenting.charts import bracket_historgram as cbh
 from presenting.charts import bracket_cumulative as cbc
 
+from presenting.charts import missed_at_by_station as cmabs
 
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
@@ -56,11 +67,13 @@ expected = pandas.concat([arrivals,terminus])
 
 brackets_histogram_png= (Path(__file__).parent / "output" / "brackets_histogram.png")
 brackets_cumulative_png= (Path(__file__).parent / "output" / "brackets_cumulative.png")
+missesd_at_by_station_png= (Path(__file__).parent / "output" / "missed_at_by_station.png")
 
+station_names = dict(zip(located["naptan_id"], located["station_name"].str.removesuffix(" Underground Station")))
 
 cbh(expected,brackets_histogram_png)
 cbc(expected,brackets_cumulative_png)
-
+cmabs(expected, station_names,missesd_at_by_station_png )
 
 
 
