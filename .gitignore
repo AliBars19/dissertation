@@ -9,3 +9,4 @@ data/vps-2026-11-19.db
 /analysis/processing/__pycache__
 /analysis/__pycache__
 /analysis/output
+/data/stopwatch_test.csv

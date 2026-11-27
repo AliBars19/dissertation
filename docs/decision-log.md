@@ -584,3 +584,23 @@ Status values: `DECIDED`, `PROPOSED` (awaiting my decision or my consultant), `S
   in whole seconds, so whole seconds is the precision of the thing being judged. On the development
   data: criterion 1 is 95.0% (85.3% with exact times) and criterion 2 is 60 s (60.011 s), so both pass.
   Decided on the development data before any pilot data was analysed.
+
+## D-036: How stopwatch timings are matched to inferred arrivals (criterion 3)
+- **Date:** 2026-11-27 · **Status:** DECIDED · **Decided by:** me
+- **Decision:** Each stopwatch timing is matched to the inferred arrival at the same station, in the
+  same direction (Southbound platform = `inbound`, Northbound = `outbound` on the Victoria line),
+  closest in time. If no inferred arrival is within 180 s, the timing is unmatched and listed in the
+  results, not dropped. Every matched difference counts in the median, however large. The difference
+  is the inferred arrival minus the stopwatch time, so a positive value means the method places the
+  arrival too late.
+- **Alternatives considered:** a tight cap (for example 30 s); no cap at all.
+- **Reasoning:** **[AI-expanded]** On the development data, southbound trains reach Oxford Circus a
+  median of 120 s apart, and only 1 gap in 10 is under 60 s. Matching to the nearest arrival
+  therefore picks the right train whenever the method is off by less than about half that gap (about
+  60 s), which is well above criterion 3's 30 s pass mark, so wrong-train matches cannot produce a
+  false pass. A tight cap would turn every large error into "unmatched" and leave only the good
+  timings in the median, so criterion 3 would pass by construction. With no cap, a timing taken while
+  the logger or TfL had nothing (for example during an outage) would be matched to a train far away:
+  a made-up timing at Oxford Circus at 03:00 on 2026-11-18, when the line was closed, is 9,241 s from
+  the nearest inferred arrival. 180 s only catches that case. Decided on the development data before
+  any pilot data was analysed, and before any stopwatch timings were taken.

@@ -1,6 +1,6 @@
 import pandas
 
-def results_table(health, longest, update, criteria):
+def results_table(health, longest, update, criteria,c3):
     rows = [
         {
             "criteria":1,
@@ -15,6 +15,13 @@ def results_table(health, longest, update, criteria):
                     "value": criteria["criteria2"],
                     "pass_mark": "60 seconds or less",
                     "passed": criteria["criteria2_pass"]            
+        },
+        {
+            "criteria":3,
+                    "measure": "Median abs diff from stopwatch",
+                    "value": c3["criteria3"],
+                    "pass_mark": "30 seconds or less on at least 20 timings spread over multiple days",
+                    "passed": c3["criteria3_pass"]         
         },
         {
             "criteria":4,

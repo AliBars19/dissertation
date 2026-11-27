@@ -32,6 +32,10 @@ from processing.arrivals import terminus_arrivals as ata
 
 from processing.criteria import criteria_1_and_2 as cc1a2
 
+from processing.stopwatch import load_stopwatch as sls
+from processing.stopwatch import match_stopwatch as sms
+from processing.stopwatch import criteria3 as sc3
+
 #presenting imports
 
 from presenting.report import results_table as rrt
@@ -43,11 +47,12 @@ from presenting.charts import missed_at_by_station as cmabs
 
 from presenting.charts import track_single_trip as ctst
 
+
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
 
 db_path = "/home/alibars/Downloads/UNI/Year 3/dissertation/data/vps-2026-11-19.db"
-#hardcoded rn but will change when the time comes
+stopwatch_csv = Path(__file__).parent.parent / "data"/"stopwatch_test.csv"
 
 requests = llr(db_path, start , end)
 print ("requests parsed")
@@ -82,9 +87,7 @@ print("criteria parsed")
 
 expected = pandas.concat([arrivals,terminus])
 
-results = rrt(health,longest,update,criteria)
-csv = Path(__file__).parent/"output"/"pilot_results.csv"
-results.to_csv(csv, index=False)
+
 
 brackets_histogram_png= (Path(__file__).parent / "output" / "brackets_histogram.png")
 brackets_cumulative_png= (Path(__file__).parent / "output" / "brackets_cumulative.png")
@@ -103,9 +106,16 @@ print("missed AT parsed")
 ctst(clean_trials, expected, 171, station_names, track_single_trip_png)
 print("track single parsed")
 
+timings = sls(stopwatch_csv)
+matches = sms(timings,expected,clean_trials,station_names)
+crit3 = sc3(matches)
+matches.to_csv(Path(__file__).parent / "output" / "stopwatch_matches.csv", index=False)
 
+results = rrt(health,longest,update,criteria,crit3)
+csv = Path(__file__).parent/"output"/"pilot_results.csv"
+results.to_csv(csv, index=False)
 
-
+print("well done u did it")
 '''
 print(critera)
 

@@ -97,7 +97,8 @@ I do not need to see the logger's data while timing. I record what I see, and ma
    window.
 6. **Matching:** each timed arrival is matched to the inferred arrival at the same station and
    platform closest in time (Victoria trains are at least about 100 seconds apart, so the match is
-   unambiguous). Unmatched timings are reported, not dropped.
+   unambiguous). Unmatched timings are reported, not dropped. Matching rule fixed in D-036
+   (2026-11-27): same station and direction, nearest in time, unmatched if nothing is within 180 s.
 
 ## Settled so far
 - **Where it runs:** my OVHcloud VPS (D-019).

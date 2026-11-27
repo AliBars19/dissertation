@@ -133,6 +133,17 @@ Each step ends with a check that must pass before I start the next one.
 11. **Stopwatch matching (criterion 3).** My timings read from a CSV and matched to inferred arrivals
     at the same station and platform.
     *Check:* every timing is matched or listed as unmatched.
+    *Rule (D-036, 2026-11-27):* nearest inferred arrival at the same station and direction; unmatched
+    if none is within 180 s. Tested first on four made-up timings inside the development window
+    (`data/stopwatch_test.csv`): Oxford Circus 20:35:05, Victoria 20:39:00 and Vauxhall 20:43:20
+    southbound on 2026-11-17 should match train 210 at -7.3, -2.3 and -7.4 s, and Oxford Circus at
+    03:00 on 2026-11-18 (line closed) should be unmatched.
+    *Progress:* code done 2026-11-27 (`processing/stopwatch.py`: `load_stopwatch`, `match_stopwatch`,
+    `criteria3`; criterion 3 row added to the results table; matches written to
+    `output/stopwatch_matches.csv`). On the four made-up timings: -7.28, -2.25 and -7.39 s (train
+    210, `seen_at` True, True, False) and one unmatched, so a median of 7.28 s and criterion 3 False,
+    because 3 timings on 1 day is under the minimum of 20 on 2 days. Waiting on my real timings
+    (`data/stopwatch.csv`) for the pilot run.
 
 ### C. Pilot
 12. **One run on the pilot window** after 2 December, then the go/no-go write-up in `docs/pilot/`.
