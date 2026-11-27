@@ -5,5 +5,7 @@ UNI-Docs/
 /data/logger.db
 .venv/
 data/vps-2026-11-19.db
+/analysis/presenting/__pycache__
+/analysis/processing/__pycache__
 /analysis/__pycache__
 /analysis/output

@@ -1,28 +1,30 @@
 from pathlib import Path
 
 
-from analysis.processing.load import load_requests as llr
-from analysis.processing.load import load_predictions as llp
+from processing.load import load_requests as llr
+from processing.load import load_predictions as llp
 
-from analysis.processing.health import failure_rate as hfr
-from analysis.processing.health import longest_gap as hlg
-from analysis.processing.health import empty_runs as her
+from processing.health import failure_rate as hfr
+from processing.health import longest_gap as hlg
+from processing.health import empty_runs as her
 
-from analysis.processing.freshness import label_freshness as flf
-from analysis.processing.freshness import update_interval as fui
-from analysis.processing.freshness import fresh_predictions as ffp
+from processing.freshness import label_freshness as flf
+from processing.freshness import update_interval as fui
+from processing.freshness import fresh_predictions as ffp
 
-from analysis.processing.locations import list_locations as lll
-from analysis.processing.locations import add_states as las
-from analysis.processing.locations import add_station_ids as lasi
+from processing.locations import list_locations as lll
+from processing.locations import add_states as las
+from processing.locations import add_station_ids as lasi
 
-from analysis.processing.trails import build_trails as tbt
-from analysis.processing.trails import drop_backwards as tdb
+from processing.trails import build_trails as tbt
+from processing.trails import drop_backwards as tdb
 
-from analysis.processing.arrivals import infer_arrivals as aia
-from analysis.processing.arrivals import terminus_arrivals as ata
+from processing.arrivals import infer_arrivals as aia
+from processing.arrivals import terminus_arrivals as ata
 
-from analysis.processing.criteria import criteria_1_and_2 as cc1a2
+from processing.criteria import criteria_1_and_2 as cc1a2
+
+from presenting.report import results_table as rrt
 
 start = "2026-11-17T14:45:00Z"
 end = "2026-11-19T00:00:00Z"
@@ -44,17 +46,17 @@ trails = tbt(located)
 clean_trials,dropped = tdb(trails)
 arrivals = aia(clean_trials)
 terminus = ata(clean_trials)
+criteria = cc1a2(arrivals,terminus)
 
-critera = cc1a2(arrivals,terminus)
+results = rrt(health,longest,update,criteria)
+csv = Path(__file__).parent/"output"/"pilot_results.csv"
+results.to_csv(csv)
 
+'''
 print(critera)
 
 
-
-
-
 print(len(terminus))
-'''
 
 
 print(len(arrivals))
